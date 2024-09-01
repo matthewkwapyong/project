@@ -1,0 +1,267 @@
+.Block {
+    /* position: fixed; */
+    /* top: 0;
+    left: 0; */
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.Side_bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 20;
+    transition: 200ms;
+    /* min-width: 88px; */
+    min-width: 422px;
+    width: 22%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+
+
+.sideContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 98%;
+    width: 90%;
+    transition: 200ms;
+    border-radius: 10px;
+    background-color: #0a0a0a;
+    border: 1px rgb(52, 51, 51) solid;
+}
+
+.sideContainer::before {
+    content: "";
+    position: absolute;
+    background-image: url(/grain2.png);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+#top {
+    display: flex;
+    flex-direction: column;
+    max-height: 130px;
+    height: 57px;
+    background-color: #121212c9;
+    border-radius: 10px;
+}
+
+.Chat {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    flex-direction: column;
+}
+
+.Header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #2b2a2a5d;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.mid {
+    flex-grow: 1;
+    height: 80%;
+}
+
+.MessageInputContainer {
+    position: relative;
+    /* flex-shrink: 0;
+    flex: 1; */
+    /* position: absolute; */
+    bottom: 0;
+    width: 100%;
+    min-height: 100px;
+    background-color: rgba(255, 255, 255, 0.438);
+}
+
+.Main {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.chatListContainer {
+    height: 90%;
+    overflow-y: scroll;
+}
+
+.chatList {
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: auto;
+
+}
+
+.chatItem {
+    display: flex;
+    width: 95%;
+    height: 84px;
+    /* background-color: #919191c9; */
+    border-radius: 10px;
+    z-index: 5;
+}
+
+.chatItem:hover {
+    background-color: #91919112;
+}
+
+#active {}
+
+.chatItem #active {
+    background-color: #91919112;
+    backdrop-filter: blur(3px);
+}
+
+.chatImage {
+    padding: 5px;
+    width: 64px;
+    height: 100%;
+    /* background-color: aliceblue;
+    border-radius: 40px; */
+}
+
+.chatImage>div {
+    width: 64px;
+    height: 64px;
+    background-color: aliceblue;
+    border-radius: 40px;
+}
+
+.chatImage>div img {
+    width: 64px;
+    height: 64px;
+    border-radius: 40px;
+}
+
+.chatInfo {
+    display: flex;
+    flex-direction: column;
+    width: 78%;
+    padding: 5px;
+    padding-top: 15px;
+}
+
+.nameTime {
+    display: flex;
+}
+
+.nameTime #name {
+    display: flex;
+    width: 70%;
+}
+
+.nameTime #name>label {
+    font-weight: 600;
+    color: white;
+}
+
+.nameTime #time {}
+
+.nameTime #time>label {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: white;
+}
+
+#recent_message>label {
+    color: white;
+}
+
+
+
+
+
+
+
+
+.messageListContainer {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.messageList {
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: auto;
+    margin-top: 100px;
+}
+
+.messageItem {
+    display: flex;
+    width: 95%;
+    height: auto;
+    min-height: 40px;
+    line-break: auto;
+    /* height: 84px; */
+    /* background-color: #919191c9; */
+    border-radius: 10px;
+    z-index: 5;
+}
+
+.messageItem:hover {
+    background-color: #91919112;
+}
+.messageItem >  div label{
+    color: white;
+}
+#right{
+    display: flex;
+    width: 100%;  
+    line-break: anywhere;
+}
+#left{
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.messageListContainer::-webkit-scrollbar {
+    width: 10px;
+
+    /* min-height: 817px; */
+    color: #ffffff;
+}
+
+.messageListContainer::-webkit-scrollbar :hover {
+    width: 0px;
+    height: 0px;
+}
+.messageListContainer::-webkit-scrollbar-track {
+    margin-top: 100px;
+    height: 0px;
+}
+
+.messageListContainer::-webkit-scrollbar-thumb {
+    
+    border-radius: 3px;
+}
+
+.messageListContainer::-webkit-scrollbar-thumb:hover {
+    width: 20px;
+}
