@@ -1,63 +1,50 @@
-// let express = require('express')
-// let pg = require('pg')
+require('dotenv').config()
+const express = require("express");
+const { createServer } = require('node:http');
+const app = express();
+const server = createServer(app);
+const cors = require('cors');
 
+app.use(cors());
+// app.use(express.urlencoded({ extended: true }));
 
-// let app = express();
-
-
-// const { Client,Pool } = pg
-// const client = new Client()
-
-
-
-// const pool = new Pool({
-//     user: 'postgres',
-//     password: 'matthew',
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'postgres',
-//   })
-
+const { Server } = require("socket.io");
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000  "
+    }
+});
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('message', (data) => {
+        console.log(data);
+      });
+  });
   
-// async function k(){
-//     // await client.connect()
-//     const res = await pool.query('SELECT * from users', [])
-//     console.log(res.rows)
-
-// }
- 
-// k()
-
-
-
-// // app.get('/he',(req,res)=>{
-   
-// // })
-
-
-// // app.listen(5000)
 
 
 
 
 
+let lof = require('./routes/authenticate')
+app.use(express.json())
+app.use('/api',lof)
 
-class Ap{
-    #hello = "smeacsak"
-    constructor(name){
-      this.name = name
-    }
+
+
+
+
+// let m = jwt.sign("mello","matt")
+// jwt.verify(m, 'matt', function(err, decoded) {
     
-    a(){
-      console.log(this.#hello)
-      console.log(this.name)
-    }
-}
+//   });
+  
+app.get("/", (req, res) => res.send("Hello, world!"));
 
-
-class dog extends Ap{
-
-}
-
-let g = new dog("aaa")
-
+app.use('/',()=>{
+    console.log(
+        "req"
+    )
+})
+const PORT = 3001;
+server.listen(PORT, () => console.log(`My first Express app - listening on port ${PORT}!`));
