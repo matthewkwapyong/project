@@ -4,7 +4,9 @@ body {
   background-repeat: no-repeat; */
   height: 100%;
   margin: 0;
-  background-color: #21242b;
+  background-color: #0B0B0B;
+  /* background: #181818; */
+  /* background-color: #21242b; */
   /* background-color: #0f0f0f; */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -84,7 +86,7 @@ body {
   font-size: 15px;
   line-height: 27px;
   background-color: #00000000;
-  text-align: center;
+      -align: center;
   color: white;
   cursor: pointer;
 }
@@ -168,3 +170,14 @@ body {
   /* background: #5e5c5c; */
   width: 20px;
 }
+
+
+
+
+
+
+
+
+
+
+

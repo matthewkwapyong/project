@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 function validateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader.split(' ')[1]
@@ -8,8 +9,14 @@ function validateToken(req, res, next) {
             res.status(401).json({ auth: false });
             return;
         }
+        // console.log(decoded)
         req.tokenData = decoded
         next();
     });
 }
-module.exports = validateToken;
+
+function generateAccessToken(user) {
+    return jwt.sign(user, process.env.secretKey, { expiresIn: '15s' })
+}
+
+module.exports = {validateToken,generateAccessToken};

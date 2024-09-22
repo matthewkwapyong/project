@@ -11,7 +11,7 @@ export function Item({children,onClick}) {
 }
 export function Drop({ children }) {
     let [show, setShow] = useState("block");
-    useEffect(()=>{
+    useEffect(()=>{ 
         document.addEventListener('click',() =>{
 
         })
@@ -24,7 +24,7 @@ export function Drop({ children }) {
                         <feTurbulence type="turbulance" baseFrequency={0.65}/>
                     </filter>
                 </svg> */}
-                <div className="dropbtn" onClick={() => setShow("block")} >:sss</div>
+                {/* <div classNam   e="dropbtn" onClick={() => setShow("block")} >:sss</div> */}
                 <div className="dropdown_content" onMouseLeave={() => setShow("none")} style={{ display: show }}>
                     <div className="drop">
                         {children}
