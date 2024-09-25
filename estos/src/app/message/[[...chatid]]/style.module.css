@@ -13,7 +13,8 @@
     border-right: 1px solid #1f1f1f;
     /* background-color: #151515c9; */
 }
-.mainside >div{
+
+.mainside>div {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,7 +68,7 @@
     opacity: 0.3;
     z-index: 1;
 } */
-.searchContainer{
+.searchContainer {
     position: fixed;
     top: 0;
     display: flex;
@@ -79,7 +80,8 @@
     height: 100%;
     z-index: 100;
 }
-.searchContainer > div{
+
+.searchContainer>div {
     position: relative;
     width: 642px;
     height: 519px;
@@ -87,11 +89,12 @@
     background-color: #131313;
     backdrop-filter: blur(10px);
     box-shadow:
-      0px 0px 0px 1px rgba(0, 0, 0, 0.425),
-      0px 4px 20px 1px rgb(0 0 0 / 61%),
-      inset 0px 0px 0px 1px rgba(185, 185, 185, 0.418);
+        0px 0px 0px 1px rgba(0, 0, 0, 0.425),
+        0px 4px 20px 1px rgb(0 0 0 / 61%),
+        inset 0px 0px 0px 1px rgba(185, 185, 185, 0.418);
 }
-.searchContainer > div::before {
+
+.searchContainer>div::before {
     content: "";
     position: absolute;
     background-image: url(/grain2.png);
@@ -102,7 +105,7 @@
     pointer-events: none;
     opacity: 0.3;
     z-index: 1;
-  }
+}
 
 .Main {
     flex: 1;
@@ -112,6 +115,7 @@
     align-items: center;
     justify-content: center;
 }
+
 .logoContainer {
     display: flex;
     flex-direction: row;
@@ -119,9 +123,11 @@
     height: 100%;
     gap: 10px;
 }
-.logoContainer > input{
+
+.logoContainer>input {
     height: 30px;
 }
+
 #top {
     display: flex;
     flex-direction: column;
@@ -130,7 +136,8 @@
     /* background-color: #121212c9; */
     /* border-radius: 10px; */
 }
-.createChat{
+
+.createChat {
     display: flex;
     width: 60px;
     height: 60px;
@@ -139,16 +146,18 @@
     border: none;
     cursor: pointer;
 }
-.createChat>div{
+
+.createChat>div {
     display: flex;
     justify-content: center;
     align-items: center;
-    width:100%; 
-    height:100%;
+    width: 100%;
+    height: 100%;
 }
-.createChat >div>svg{
-    width:70%; 
-    height:70%;
+
+.createChat>div>svg {
+    width: 70%;
+    height: 70%;
 }
 
 
@@ -170,6 +179,7 @@
     /* backdrop-filter: blur(10px); */
     z-index: 50;
 }
+
 .topContainer {
     display: flex;
     align-items: center;
@@ -180,21 +190,93 @@
     background: #060509;
     border-bottom: 1px solid #1f1f1f;
 }
+
 .topImageContainer {
     width: 50px;
     height: 50px;
     border-radius: 60px;
     overflow: hidden;
 }
-.topImageContainer > img{
+
+.topImageContainer>img {
     width: 100%;
     height: 100%;
 }
-.topNameContainer > label{
+
+.topNameContainer>label {
     font-weight: 600;
     font-size: 18px;
     color: white;
 }
+
+.typingContainer {
+    display: flex;
+    width: 100%;
+    height: 50px;
+    background-color: #060509;
+    align-items: center;
+    gap: 10px;
+}
+
+.typingContainer>label {
+    margin-left: 13px;
+    color: white;
+}
+
+
+#animationCont {
+    display: flex;
+    gap: 2px;
+    height: 14px;
+    margin-left: 14px;
+    background-color: #b4b4b438;
+    border-radius: 10px;
+    padding: 10px;
+    align-items: center;
+}
+
+#ani1 {
+    width: 8px;
+    height: 8px;
+    border-radius: 30px;
+    background-color: #f0f0f0;
+    animation: float 2s infinite;
+    animation-delay: 0.2s;
+
+}
+
+#ani2 {
+    width: 8px;
+    height: 8px;
+    border-radius: 30px;
+    background-color: #f0f0f0;
+    animation: float 2s infinite;
+    animation-delay: 0.4s;
+
+}
+
+#ani3 {
+    width: 8px;
+    height: 8px;
+    border-radius: 30px;
+    background-color: #f0f0f0;
+    animation: float 2s 1s infinite;
+    animation-delay: 0.6s;
+
+}
+
+@keyframes float {
+    0% {
+        opacity: 0.2;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.2;
+      }
+}
+
 .MessagesContainer {
     flex: 1;
     overflow: auto;
@@ -230,6 +312,7 @@
     border: 1px solid #2b2b2bfa;
     /* box-shadow: 0px 0px 5px 0px #28282854; */
 }
+
 /* .InputContainer :focus-within{
     box-shadow: 0px 0px 13px 0px #28282854;
 } */
@@ -281,6 +364,7 @@
     font-size: 11px;
     text-shadow: 1px 1px 20px rgba(255, 255, 255, 0.115);
 }
+
 .Main {
     flex: 1;
     height: 100vh;
@@ -291,8 +375,18 @@
 }
 
 .chatListContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     height: 90%;
     overflow-y: scroll;
+}
+
+.chatListContainer>div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .chatList {
@@ -454,9 +548,10 @@
     background-color: #b4b4b438;
     border-radius: 10px;
 }
-#text > label{
+
+#text>label {
     color: #fff;
-    font-weight:600;
+    font-weight: 600;
     white-space: pre-wrap;
 }
 

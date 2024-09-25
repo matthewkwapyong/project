@@ -80,7 +80,7 @@ function Chat({ selectChat, user, data, active }) {
         </div >
     )
 }
-function Chat2({ data }) {
+function Chat2({ data,updateChatlist }) {
     let itemRef = useRef(null)
     async function create() {
         console.log("creating chat with", data)
@@ -94,12 +94,12 @@ function Chat2({ data }) {
             body: JSON.stringify({ receiver: data.id })
 
         })
-        let dat = await response.json();
-        console.log(dat)
+        let result = await response.json();
+        if(!result.exists){
+            updateChatlist(result)
+        }
+        console.log(result)
     }
-    useEffect(() => {
-        console.log(data)
-    }, [])
     return (
         <div className={searcha.chatItem}
             ref={itemRef}
@@ -137,6 +137,12 @@ export default function Side() {
     let [searching, setsearching] = useState(false)
     let { activeChat, setactiveChat, loading, user } = useMessageContext()
     const params = useParams()
+    function updateChatlist(data){
+        console.log(data )
+        setuserChats((prevChat) => [data.chat_info,...prevChat]);
+        router.push(`/message/${data.chat_info.chat.id}`, undefined, { shallow: true })
+        setsearching(false)
+    }
     async function search(e) {
         setsearchValue(e.target.value)
         let accessToken = getCookie('accessToken');
@@ -252,7 +258,7 @@ export default function Side() {
                         <div className={searcha.chatListContainer}>
                             <div>
                                 {searchData.map((data) => (
-                                    <Chat2 data={data} key={data.id} />
+                                    <Chat2 updateChatlist={updateChatlist} data={data} key={data.id} />
                                 ))}
                             </div>
                         </div>
@@ -286,11 +292,11 @@ export default function Side() {
                         {chatLoading ?
                             <></>
                             :
-                            <>
+                            <div>
                                 {userChats.map((data) => (
                                     <Chat user={user} data={data} selectChat={selectChat} key={data.chat.id} />
                                 ))}
-                            </>
+                            </div>
                         }
 
                     </div>

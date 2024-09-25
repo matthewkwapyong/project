@@ -57,7 +57,7 @@ function Bubble({ data, user }) {
             {data.sender == user.id ?
                 <div className={styles.mainContainer + " " + styles.sendContainer} >
                     <div id={styles.bubble} ref={itemRef} >
-                        <div id={styles.text} style={{background:"#0058c0"}}>
+                        <div id={styles.text} style={{ background: "#0058c0" }}>
                             <label>
                                 {data.body}
                             </label>
@@ -95,7 +95,13 @@ export default function Main({ params }) {
     let [messages, setMessages] = useState([])
     let [inputValue, setinputValue] = useState("")
     let [messageLoading, setmessageLoading] = useState(true)
+    let [typing, setTyping] = useState(false)
+    let typingTimeout = useRef(null)
     const containerRef = useRef(null);
+    const userRef = useRef(user);
+    const activeChatRef = useRef(activeChat);
+
+
     function name(s) {
         let item1 = activeChat.members[0]
         let item2 = activeChat.members[1]
@@ -105,6 +111,12 @@ export default function Main({ params }) {
         else return null
     }
     function changeValue(e) {
+        socket.emit('typing', { room: activeChat.chat.id.toString(), user: userRef.current });
+        clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => {
+            console.log("stope")
+            socket.emit('stoptyping',{ room: activeChat.chat.id.toString(), user: userRef.current });
+        }, 2000)
         setinputValue(e.target.value)
     }
     function send() {
@@ -131,6 +143,19 @@ export default function Main({ params }) {
         setmessageLoading(false)
     }
     useEffect(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+      }, [messages]);
+
+    useEffect(() => {
+        userRef.current = user;
+    }, [user])
+    useEffect(() => {
+        activeChatRef.current = activeChat.chat;
+    }, [activeChat])
+    
+    useEffect(() => {
         // console.log(user)
         if (params.chatid) {
             if (!initialized.current) {
@@ -139,11 +164,25 @@ export default function Main({ params }) {
                 socket.emit('join', {
                     id: params.chatid[0]
                 })
-                socket.on('chat', function (data) {
+                socket.on('chat', (data) => {
+                    console.log("sasa",data)
                     setMessages((prevChat) => [...prevChat, data]);
                 });
+                socket.on('typing', (data) => {
+                    console.log(data.room == activeChatRef.current.id && data.user.id != userRef.current.id)
+                    if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
+                        setTyping(true)
+                    }
+                })
+                socket.on('stoptyping', (data) => {
+                    if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
+                        setTyping(false)
+                    }
+                })
             }
         }
+        return () => {
+        };
     }, [])
     useEffect(() => {
         if (params.chatid) {
@@ -204,11 +243,24 @@ export default function Main({ params }) {
                                         {messages.map((data) => (
                                             <Bubble data={data} user={user} key={data.id} />
                                         ))}
-                                        <Scroll />
+                                        {/* <Scroll /> */}
                                     </>
                                 }
                             </div>
                         </div>
+                    </div>
+                    <div className={styles.typingContainer}>
+                        {typing ?
+                        <>
+                                <div id={styles.animationCont}>
+                                    <div id={styles.ani1}></div>
+                                    <div id={styles.ani2}></div>
+                                    <div id={styles.ani3}></div>
+                                </div>
+                        </>
+                            :
+                            <></>
+                        }
                     </div>
                     <div className={styles.MessageInputContainer}>
                         <div className={styles.InputContainer}>
