@@ -119,6 +119,8 @@
 .logoContainer {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     height: 100%;
     gap: 10px;
@@ -132,19 +134,67 @@
     display: flex;
     flex-direction: column;
     max-height: 130px;
-    height: 70px;
+    height: 100px;
+    margin-bottom: 20px;
+    
     /* background-color: #121212c9; */
     /* border-radius: 10px; */
 }
 
+#messagesTitle{
+    height: 45px;
+    display: flex;
+    align-items: center;
+    margin-left: 5px;
+}
+#messagesTitle > label{
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+}
+
+#search_logo {
+    height: 100%;
+    width: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#search_logo>svg {
+    margin-left: 5px;
+    width: 16px;
+    height: 40%;
+}
+
+.search {
+    display: flex;
+    width: 95%;
+    height: 99%;
+    border: 1px solid #2b2b2bfa;
+    border-radius: 5px;
+}
+
+.search>input {
+    width: 87%;
+    border: none;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0);
+    outline: none;
+    font-size: 14px;
+}
 .createChat {
     display: flex;
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.16);
+    width: 45px;
+    height: 45px;
+    border-radius: 30px;
+    background-color: rgba(255, 255, 255, 0);
     border: none;
     cursor: pointer;
+    margin-right: 5px;
+}
+.createChat:hover{
+    background: #27272f94;
 }
 
 .createChat>div {
@@ -157,7 +207,7 @@
 
 .createChat>div>svg {
     width: 70%;
-    height: 70%;
+    height: 44%;
 }
 
 
@@ -378,7 +428,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 90%;
+    height: 84%;
     overflow-y: scroll;
 }
 
@@ -398,6 +448,19 @@
     gap: 10px;
     height: auto;
 
+}
+.activeContainer{
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 10px;
+}
+.activeContainer >div{
+    height: 70%;
+    width: 5px;
+    background-color: #0057af;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
 
 .chatItem {
@@ -478,6 +541,15 @@
 }
 
 
+.typingC{
+
+}
+.typingC > label{
+  color: #007fff; 
+  animation: floa; 
+  animation: float 3s infinite;
+  animation-delay: 0.2s;
+}
 .messageListContainer {
     height: 100%;
     overflow-y: scroll;
