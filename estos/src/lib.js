@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from 'next/navigation'
 
-export async function Signup(formData) {
+export async function Signup(prevState, formData) {
     let date = new Date()
     const fields = {
         firstname: formData.get("first_name"),
@@ -29,10 +29,13 @@ export async function Signup(formData) {
             path: "/",
             sameSite: "lax",
         });
-        redirect(`/home`)
+        
+        redirect(`/message`)
+    }else{
+        return data
     }
 }
-export async function Login(formData) {
+export async function Login(prevState, formData) {
     const fields = {
         username: formData.get("username"),
         password: formData.get("password"),
@@ -54,7 +57,9 @@ export async function Login(formData) {
             path: "/",
             sameSite: "lax",
         });
-        redirect(`/home`)
+        redirect(`/message`)
+    }else{
+        return data
     }
 }
 

@@ -38,27 +38,31 @@ async function addtomessage(sender, body, chat_id, date) {
 };
 
 let rooms = {}
+let onlineUsers = []
 io.on('connection', (socket) => {
 
     socket.on('join', (room) => {
+        console.log(room)
         if (rooms[room.id] && rooms[room.id].includes(socket.id)) {
         } else {
             if (!rooms[room.id]) {
                 rooms[room.id] = [];
             }
-            console.log(room)
             rooms[room.id].push(socket.id)
             socket.join(room.id)
         }
     })
     socket.on('typing', (data) => {
         io.in(data.room).emit('typing', data)
+        socket.broadcast.emit('eventTyping',data.room)
+
         //   .emit('typing', "hello");
         // io.to(84).emit("typing", data)
     });
     socket.on('stoptyping', (data) => {
         // console.log(data)
         io.in(data.room).emit('stoptyping', data)
+        socket.broadcast.emit('eventstopTyping',data.room)
     })
     socket.on('disconnect', (data) => {
 

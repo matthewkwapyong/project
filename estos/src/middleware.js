@@ -8,6 +8,8 @@ function redirectTo(url, request) {
 
 export async function middleware(request) {
   let accessToken = request.cookies.get('accessToken')
+  const isMessagePath = request.nextUrl.pathname.startsWith('/message');
+
   if (accessToken) {
     try {
       let response = await fetch(`${url}/token/verify`, {
@@ -39,8 +41,9 @@ export async function middleware(request) {
           return redirectTo('/login', request.url);
         }
       } else {
-        if (request.nextUrl.pathname !== '/home') {
-          return redirectTo('/home', request);
+
+        if (!isMessagePath) {
+          return redirectTo('/message', request);
         }
         return NextResponse.next();
       }
@@ -58,5 +61,5 @@ export async function middleware(request) {
   }
 }
 export const config = {
-  matcher: ["/home/:path*", "/login"],
+  matcher: ["/message/:path*", "/login"],
 };

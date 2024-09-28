@@ -4,12 +4,12 @@ let express = require('express')
 let router = express();
 let jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
-let pool = require('../db');
+let pool = require('../db/connection');
 const { generateAccessToken } = require('../middleware/jwt');
 const saltRounds = 10;
 
-async function checkUserExists(id) {
-    const query = await pool.query('SELECT username from users where username = $1', [id])
+async function checkUserExists(id,email) {
+    const query = await pool.query('SELECT username,email from users where username = $1 OR email = $2', [id,email])
     if (query.rowCount > 0) {
         return true;
     }
@@ -28,7 +28,7 @@ router.post('/login', async (req, res) => {
             cookieMaxAge.setTime(cookieMaxAge.getTime() + (1 * 24 * 60 * 60 * 1000));
             var token = generateAccessToken({ id: query.rows[0].id });
             const refreshToken = jwt.sign({ id: query.rows[0].id }, process.env.refreshKey)
-            res.json({ authenticated: true, token, maxAge: cookieMaxAge, refresh: refreshToken })
+            res.json({ authenticated: true, token, maxAge: cookieMaxAge, refresh: refreshToken })    
         } else {
             res.json({ authenticated: false, type: 1 })
         }
@@ -45,7 +45,7 @@ router.post('/create', async (req, res) => {
         password,
         created
     } = req.body;
-    if (await checkUserExists(username)) return res.json({ exists: true });
+    if (await checkUserExists(username,email)) return res.json({ exists: true });
     try {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const text = 'INSERT INTO users(email,firstname,lastname,username,password,created) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *'
