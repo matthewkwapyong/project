@@ -114,9 +114,8 @@ export default function Main({ params }) {
         socket.emit('typing', { room: activeChat.chat.id.toString(), user: userRef.current });
         clearTimeout(typingTimeout.current);
         typingTimeout.current = setTimeout(() => {
-            console.log("stope")
             socket.emit('stoptyping',{ room: activeChat.chat.id.toString(), user: userRef.current });
-        }, 2000)
+        }, 1000)
         setinputValue(e.target.value)
     }
     function send() {
@@ -132,7 +131,7 @@ export default function Main({ params }) {
     }
     async function getMessages() {
         let accessToken = getCookie('accessToken');
-        let response = await fetch(`http://localhost:3001/chat/chats/${params.chatid[0]}/messages`, {
+        let response = await fetch(`/api/chat/chats/${params.chatid[0]}/messages`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -165,11 +164,11 @@ export default function Main({ params }) {
                     id: params.chatid[0]
                 })
                 socket.on('chat', (data) => {
-                    console.log("sasa",data)
-                    setMessages((prevChat) => [...prevChat, data]);
+                    if(data.added){
+                        setMessages((prevChat) => [...prevChat, data.data]);
+                    }
                 });
                 socket.on('typing', (data) => {
-                    console.log(data.room == activeChatRef.current.id && data.user.id != userRef.current.id)
                     if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
                         setTyping(true)
                     }
