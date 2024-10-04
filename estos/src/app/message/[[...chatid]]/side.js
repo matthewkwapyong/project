@@ -98,7 +98,11 @@ function Chat({ selectChat, user, data, active, who }) {
                     </div>
                 </div>
                 <div id={styles.recent_message}>
-                    <label></label>
+                    {data.new ?
+                        <label style={{ color: "#3f9eff" }}>New Message</label>
+                        :
+                        <></>
+                    }
                 </div>
                 <div className={styles.typingC} style={typing ?
                     { display: "block" } :
@@ -115,9 +119,8 @@ function Chat({ selectChat, user, data, active, who }) {
 function Chat2({ data, updateChatlist }) {
     let itemRef = useRef(null)
     async function create() {
-        console.log("creating chat with", data)
         let accessToken = getCookie('accessToken');
-        let response = await fetch(`http://localhost:3001/chat/create`, {
+        let response = await fetch(`/api/chat/create`, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${accessToken}`,
@@ -130,7 +133,6 @@ function Chat2({ data, updateChatlist }) {
         if (!result.exists) {
             updateChatlist(result)
         }
-        console.log(result)
     }
     return (
         <div className={searcha.chatItem}
@@ -162,10 +164,15 @@ function Chat2({ data, updateChatlist }) {
 export default function Side() {
     const initialized = useRef(false)
     const router = useRouter()
+    const params = useParams()
     // let [user, setUser] = useState(null)
     let [chatLoading, setchatLoading] = useState(true)
+
     let [userChats, setuserChats] = useState([])
     let userChatsref = useRef(userChats)
+    let userChatsreff = useRef(userChats)
+    let paramRef = useRef(params)
+
     let [usersearchValue, setusersearchValue] = useState("")
     let [searchValue, setsearchValue] = useState("")
     let [searchData, setsearchData] = useState([])
@@ -176,7 +183,6 @@ export default function Side() {
     let whoref = useRef(who)
 
     let { activeChat, setactiveChat, loading, user } = useMessageContext()
-    const params = useParams()
     function name(data) {
         let item1 = data.members[0]
         let item2 = data.members[1]
@@ -186,7 +192,6 @@ export default function Side() {
         else return null
     }
     function updateChatlist(data) {
-        console.log(data)
         setuserChats((prevChat) => [data.chat_info, ...prevChat]);
         router.push(`/message/${data.chat_info.chat.id}`, undefined, { shallow: true })
         setsearching(false)
@@ -195,7 +200,7 @@ export default function Side() {
         setusersearchValue(e.target.value)
         let accessToken = getCookie('accessToken');
         if (e.target.value.length > 0) {
-            let result = await fetch(`http://localhost:3001/search/${e.target.value}`, {
+            let result = await fetch(`/api/search/${e.target.value}`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${accessToken}`
@@ -218,17 +223,17 @@ export default function Side() {
         }
         if (userChatsref.current.length === 0) userChatsref.current = userChats
         for (let i of userChatsref.current) {
-           let chatname =  name(i)
-           if(chatname.startsWith(e.target.value)){
-            temp.push(i)
-           }
+            let chatname = name(i)
+            if (chatname.startsWith(e.target.value)) {
+                temp.push(i)
+            }
         }
         setuserChats(temp)
     }
     async function getChats() {
         let accessToken = getCookie('accessToken');
         // console.log(accessToken)
-        let response = await fetch(`http://localhost:3001/chat/chats`, {
+        let response = await fetch(`/api/chat/chats`, {
             method: 'GET',
             headers: {
                 "Authorization": `Bearer ${accessToken}`
@@ -245,6 +250,20 @@ export default function Side() {
     async function newChat() {
         setsearching(true)
     }
+    useEffect(() => {
+    }, [userChats])
+    useEffect(() => {
+        paramRef.current = params
+        for (let index = 0; index < userChatsreff.current.length; index++) {
+            if (userChatsreff.current[index].chat.id == params.chatid) {
+                // userChatsreff.current.splice(index, 1);
+                let chat = userChatsreff.current[index]
+                userChatsreff.current[index] = { ...chat, new: false }
+                // setuserChats([{...chat}, ...userChatsreff.current])
+            }
+        }
+    }, [params])
+
     useEffect(() => {
         if (params.chatid) {
             for (let i of userChats) {
@@ -273,12 +292,24 @@ export default function Side() {
             })
             socket.on('eventTyping', (data) => {
                 if (!whoref.current.includes(data)) {
-                    // console.log("setting who",whoref,data)
                     setwho((prevWho) => {
                         const newWho = [data, ...prevWho];
                         whoref.current = newWho;  // Keep the ref updated
                         return newWho;
                     });
+                }
+            })
+            socket.on('newmessage', async (data) => {
+                for (let index = 0; index < userChatsreff.current.length; index++) {
+                    if (userChatsreff.current[index].chat.id == data.chat_id) {
+                        let chat = userChatsreff.current[index]
+                        userChatsreff.current.splice(index, 1);
+                        if (chat.chat.id == paramRef.current.chatid[0]) {
+                            setuserChats([{ ...chat }, ...userChatsreff.current])
+                            return;
+                        }
+                        setuserChats([{ ...chat, new: true }, ...userChatsreff.current])
+                    }
                 }
             })
         }
@@ -288,6 +319,12 @@ export default function Side() {
     useEffect(() => {
         whoref.current = who;
     }, [who])
+    useEffect(() => {
+        userChatsreff.current = userChats;
+    }, [userChats])
+    useEffect(() => {
+        socket.emit("conn", user)
+    }, [user])
     return (
         <>
             <div className="dropdown_content" >
