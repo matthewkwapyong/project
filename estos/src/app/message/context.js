@@ -18,7 +18,7 @@ export function MessageProvider({ children }) {
         try {
             // Replace this with your actual data fetching logic
             let accessToken = getCookie('accessToken');
-            let response = await fetch('http://localhost:3001/user', {
+            let response = await fetch('/api/user', {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${accessToken}`

@@ -213,3 +213,13 @@
 #recent_message>label {
     color: white;
 }
+
+.whotyping{
+
+}
+.whotyping > label{
+  color: #007fff; 
+  animation: floa; 
+  animation: float 3s infinite;
+  animation-delay: 0.2s;
+}
