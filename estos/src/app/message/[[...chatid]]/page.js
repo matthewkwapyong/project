@@ -5,9 +5,9 @@ import { useState, useRef, useEffect } from 'react';
 import socket from "../../socket";
 import { getCookie } from 'cookies-next';
 import { useMessageContext } from '../context'
+import Delete from '../../../../Components/delete'
 import Scroll from "../../../../Components/scrollToBottom";
-
-function Bubble({ data, user }) {
+function Bubble({ data, user, setContextItem }) {
     let itemRef = useRef(null)
     function format_date(date) {
         let d = new Date(date)
@@ -15,42 +15,42 @@ function Bubble({ data, user }) {
         return str
     }
     useEffect(() => {
-        // console.log(user,"saaaaaaa")
     }, [])
-    // useEffect(() => {
-    //     const contextMen = document.getElementsByClassName("dropdown_content")[0];
-    //     itemRef.current.addEventListener('contextmenu', (e) => {
-    //         e.preventDefault();
-    //         const x = e.clientX;
-    //         const y = e.clientY;
+    useEffect(() => {
+        const contextMen = document.getElementById("bubble_dropdown_content");
+        itemRef.current.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            setContextItem(data)
+            const x = e.clientX;
+            const y = e.clientY;
 
-    //         // Calculate the maximum allowable x and y positions to keep the context menu within the window
-    //         const maxX = window.innerWidth - contextMen.offsetWidth;
-    //         const maxY = window.innerHeight - contextMen.offsetHeight;
+            // Calculate the maximum allowable x and y positions to keep the context menu within the window
+            const maxX = window.innerWidth - contextMen.offsetWidth;
+            const maxY = window.innerHeight - contextMen.offsetHeight;
 
-    //         // Ensure the context menu stays within the window boundaries
-    //         contextMen.style.left = Math.min(x, maxX) + 'px';
-    //         contextMen.style.top = Math.min(y, maxY) + 'px';
-    //         contextMen.style.display = 'block';
-    //     });
+            // Ensure the context menu stays within the window boundaries
+            contextMen.style.left = Math.min(x, maxX) + 'px';
+            contextMen.style.top = Math.min(y, maxY) + 'px';
+            contextMen.style.display = 'block';
+        });
 
-    //     document.addEventListener('click', (e) => {
-    //         if (contextMen.style.display === 'block' && !contextMen.contains(e.target)) {
-    //             contextMen.style.display = 'none';
-    //         }
-    //     });
+        document.addEventListener('click', (e) => {
+            if (contextMen.style.display === 'block' && !contextMen.contains(e.target)) {
+                contextMen.style.display = 'none';
+            }
+        });
 
-    //     contextMen.addEventListener('click', () => {
-    //         contextMen.style.display = 'none';
-    //     });
+        contextMen.addEventListener('click', () => {
+            contextMen.style.display = 'none';
+        });
 
-    //     // Close the context menu when clicking outside of the window
-    //     window.addEventListener('click', (e) => {
-    //         if (contextMen.style.display === 'block' && !contextMen.contains(e.target)) {
-    //             contextMen.style.display = 'none';
-    //         }
-    //     });
-    // }, [])
+        // Close the context menu when clicking outside of the window
+        window.addEventListener('click', (e) => {
+            if (contextMen.style.display === 'block' && !contextMen.contains(e.target)) {
+                contextMen.style.display = 'none';
+            }
+        });
+    }, [])
     return (
 
         <div className={styles.messageItem}>
@@ -93,28 +93,23 @@ export default function Main({ params }) {
     const { user, loading, activeChat } = useMessageContext()
     const textareaRef = useRef(null);
     let [messages, setMessages] = useState([])
+    let messagesRef = useRef(messages)
     let [inputValue, setinputValue] = useState("")
     let [messageLoading, setmessageLoading] = useState(true)
+    let [contextItem, setContextItem] = useState()
+    let [showdel, setshowdel] = useState(false)
+    const shouldScrollRef = useRef(true);
+
     let [typing, setTyping] = useState(false)
     let typingTimeout = useRef(null)
     const containerRef = useRef(null);
     const userRef = useRef(user);
     const activeChatRef = useRef(activeChat);
-
-
-    function name(s) {
-        let item1 = activeChat.members[0]
-        let item2 = activeChat.members[1]
-        if (item1.id == user.id) {
-            return item2.username
-        } else if (item2.id == user.id) { return item1.username }
-        else return null
-    }
     function changeValue(e) {
         socket.emit('typing', { room: activeChat.chat.id.toString(), user: userRef.current });
         clearTimeout(typingTimeout.current);
         typingTimeout.current = setTimeout(() => {
-            socket.emit('stoptyping',{ room: activeChat.chat.id.toString(), user: userRef.current });
+            socket.emit('stoptyping', { room: activeChat.chat.id.toString(), user: userRef.current });
         }, 1000)
         setinputValue(e.target.value)
     }
@@ -135,17 +130,32 @@ export default function Main({ params }) {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${accessToken}`
+
             }
         })
         let data = await response.json()
         setMessages(data)
         setmessageLoading(false)
+        shouldScrollRef.current = true;
+    }
+    function contextmenu(data) {
+        setContextItem(data)
+    }
+    function removeMessage(id) {
+        shouldScrollRef.current = false;
+        const updatedItems = messages.filter(item => item.id !== id);
+        setMessages(updatedItems);
+        setshowdel(false)
+    }
+    function down() {
+
     }
     useEffect(() => {
-        if (containerRef.current) {
-          containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        messagesRef.current = messages
+        if (containerRef.current && shouldScrollRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
         }
-      }, [messages]);
+    }, [messages]);
 
     useEffect(() => {
         userRef.current = user;
@@ -153,34 +163,49 @@ export default function Main({ params }) {
     useEffect(() => {
         activeChatRef.current = activeChat.chat;
     }, [activeChat])
-    
+
     useEffect(() => {
         // console.log(user)
         if (params.chatid) {
             if (!initialized.current) {
                 initialized.current = true
                 getMessages()
-                socket.emit('join', {
-                    id: params.chatid[0]
-                })
-                socket.on('chat', (data) => {
-                    if(data.added){
+                function chat(data) {
+                    if (data.added) {
                         setMessages((prevChat) => [...prevChat, data.data]);
+                        shouldScrollRef.current = true;
                     }
-                });
-                socket.on('typing', (data) => {
+                }
+                function istyping(data) {
                     if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
                         setTyping(true)
                     }
-                })
-                socket.on('stoptyping', (data) => {
+                }
+                function stoptyping(data) {
                     if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
                         setTyping(false)
                     }
+                }
+                function deletemessage(data) {
+                    console.log(data)
+                    shouldScrollRef.current = false;
+                    const updatedItems = messagesRef.current.filter(item => item.id != data.id);
+                    setMessages(updatedItems);
+                    setshowdel(false)
+                }
+                socket.emit('join', {
+                    id: params.chatid[0]
                 })
+                socket.on('chat', chat);
+                socket.on('typing', istyping)
+                socket.on('stoptyping', stoptyping)
+                socket.on('deletemessage', deletemessage)
             }
         }
         return () => {
+            // socket.off('chat'); 
+            // socket.off('typing'); 
+            // socket.off('stoptyping'); 
         };
     }, [])
     useEffect(() => {
@@ -201,19 +226,27 @@ export default function Main({ params }) {
         <>
             {params.chatid ?
                 <div className={styles.Chat}>
-                    <div className="dropdown_content" >
+                    <div className="dropdown_content" id="bubble_dropdown_content">
                         <div className="drop">
-                            <Item onClick={() => { console.log("hello") }}>
-                                hello
-                            </Item>
-                            <Item onClick={() => { console.log("hello") }}>
-                                fello
-                            </Item>
-                            <Item onClick={() => { console.log("hello") }}>
-                                hello
-                            </Item>
+                            {contextItem?.sender === user.id ? <>
+                                <Item onClick={() => { console.log("hello") }}>
+                                    edit
+                                </Item>
+                                <Item onClick={() => { setshowdel(true) }}>
+                                    Delete
+                                </Item>
+                            </> : <>
+                                <Item onClick={() => { setshowdel(true) }}>
+                                    Delete for me
+                                </Item>
+                            </>}
                         </div>
                     </div>
+                    {showdel ?
+                        <Delete removeMessage={removeMessage} contextItem={contextItem} cancel={() => setshowdel(false)} owner={contextItem?.sender === user.id} user_id={user.id} />
+                        :
+                        <></>
+                    }
                     <div className={styles.Header}>
                         <div className={styles.topContainer}>
                             <div className={styles.topImageContainer}>
@@ -223,7 +256,7 @@ export default function Main({ params }) {
                                 <label>
                                     {activeChat.members ?
                                         <>
-                                            {name()}
+                                            {activeChat.chat.name}
                                         </>
                                         :
                                         <></>
@@ -240,7 +273,7 @@ export default function Main({ params }) {
                                     <></> :
                                     <>
                                         {messages.map((data) => (
-                                            <Bubble data={data} user={user} key={data.id} />
+                                            <Bubble data={data} user={user} key={data.id} setContextItem={contextmenu} />
                                         ))}
                                         {/* <Scroll /> */}
                                     </>
@@ -250,13 +283,13 @@ export default function Main({ params }) {
                     </div>
                     <div className={styles.typingContainer}>
                         {typing ?
-                        <>
+                            <>
                                 <div id={styles.animationCont}>
                                     <div id={styles.ani1}></div>
                                     <div id={styles.ani2}></div>
                                     <div id={styles.ani3}></div>
                                 </div>
-                        </>
+                            </>
                             :
                             <></>
                         }

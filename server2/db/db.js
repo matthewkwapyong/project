@@ -19,15 +19,21 @@ async function getChatMembers(chat_id) {
         throw error
     }
 }
-async function getChat(chat_id) {
+async function getChat(chat_id,user_id) {
     try {
         let chat_query = await pool.query("SELECT * FROM chat WHERE id = $1", [chat_id])
         let members_query = await pool.query("SELECT * FROM chatmembers WHERE chat_id = $1", [chat_id])
         let members = []
+        let name = ""
         for (let i of members_query.rows) {
             let member_data = await getUser(i.user_id)
             members.push(member_data.rows[0])
         }
+        let item1 = members[0]
+        let item2 = members[1]
+        if (item1.id == user_id) name = item2.username
+        else if (item2.id == user_id)  name = item1.username 
+        chat_query.rows[0].name = name
         return {
             chat: chat_query.rows[0],
             members: members
@@ -69,10 +75,10 @@ async function checkInChat(chat_id, user_id) {
     return query
 }
 async function getUserChats(user_id) {
-    let userc = await pool.query('SELECT id FROM chatmembers m join chat c on c.id = m.chat_id WHERE user_id = $1', [user_id])
+    let userc = await pool.query('SELECT id FROM chatmembers m join chat c on c.id = m.chat_id WHERE user_id = $1 ORDER BY updated_at DESC', [user_id])
     let user_chats = []
     for (let i of userc.rows) {
-        let chats = await getChat(i.id)
+        let chats = await getChat(i.id,user_id)
         user_chats.push(chats)
     }
     return user_chats

@@ -11,7 +11,7 @@ let chat = require('./routes/messages')
 let token = require('./routes/token')
 let validateToken = require('./middleware/jwt').validateToken
 let generateAccessToken = require('./middleware/jwt').generateAccessToken
-
+let {checkInChat} = require('./db/db');
 
 app.use(cors());
 // app.use(express.urlencoded({ extended: true }));
@@ -25,22 +25,31 @@ const io = new Server(server, {
 });
 
 async function addtomessage(sender, body, chat_id, date) {
+    const client = await pool.connect()
     const query = `
     INSERT INTO messages (chat_id, sender, body, deleted_from_sender, deleted_from_receiver, read,created_at)
     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-  `;
+    `;
     try {
-        const result = await pool.query(query, [chat_id, sender, body, false, false, false, date]);
-        return result.rows[0]
+        await client.query('BEGIN')
+        const result = await client.query(query, [chat_id, sender, body, false, false, false, date]);
+        const resut = await client.query('UPDATE chat SET updated_at = $1 WHERE id = $2', [date, chat_id]);
+
+        await client.query('COMMIT')
+        return { added: true, data: result.rows[0] }
     } catch (err) {
+        await client.query('ROLLBACK')
         console.error('Error inserting message:', err);
+        return { added: false }
+    } finally {
+        client.release()
     }
-};
+
+}
 
 let rooms = {}
 let onlineUsers = []
 io.on('connection', (socket) => {
-
     socket.on('join', (room) => {
         console.log(room)
         if (rooms[room.id] && rooms[room.id].includes(socket.id)) {
@@ -54,7 +63,7 @@ io.on('connection', (socket) => {
     })
     socket.on('typing', (data) => {
         io.in(data.room).emit('typing', data)
-        socket.broadcast.emit('eventTyping',data.room)
+        socket.broadcast.emit('eventTyping', data.room)
 
         //   .emit('typing', "hello");
         // io.to(84).emit("typing", data)
@@ -62,18 +71,69 @@ io.on('connection', (socket) => {
     socket.on('stoptyping', (data) => {
         // console.log(data)
         io.in(data.room).emit('stoptyping', data)
-        socket.broadcast.emit('eventstopTyping',data.room)
+        socket.broadcast.emit('eventstopTyping', data.room)
     })
-    socket.on('disconnect', (data) => {
+    socket.on("deleteMessage", async (data) => {
+        // console.log(data)
+        const user = data.user_id
+        const { type } = data
+        let chat_id = parseInt(data.chat_id)
+        let message_id = parseInt(data.id)
+        const client = await pool.connect()
+        try {
+            const query = await checkInChat(chat_id, user)
+            if (query.rowCount === 0) return { authorized: false };
+            if (type === 1) {
+                await client.query('UPDATE messages SET deleted_from_sender = TRUE WHERE chat_id = $1 AND id = $2', [chat_id, message_id])
+            } else if (type === 2) {
+                await client.query('DELETE FROM messages WHERE chat_id = $1 AND id = $2', [chat_id, message_id])
+            } else if (type === 3) {
+                await client.query('UPDATE messages SET deleted_from_receiver = TRUE WHERE chat_id = $1 AND id = $2', [chat_id, message_id])
+            }
+            await client.query('COMMIT')
+            console.log("gotten")
+            io.to(data.chat_id).emit('deletemessage', {deleted:true,id:message_id})
+        } catch (error) {
+            io.to(data.chat_id).emit('deletemessage', {deleted:false})
+            await client.query('ROLLBACK')
+            throw error
+        } finally {
+            client.release()
+        }
+    })
+    io.on('connection', (data) => {
+        // console.log("a user connected")
+    })
+    // console.log(`Client connected: ${socket.id}`);
 
+    // Listen for disconnect events
+    socket.on('disconnect', () => {
+        //   console.log(`Client disconnected: ${socket.id}`);
+    });
+    socket.on('conn', (data) => {
+        if (Object.keys(data).length !== 0) {
+            if (onlineUsers.length === 0) {
+                onlineUsers.push({ socketid: socket.id, auth, user: data })
+                return;
+            }
+            for (let i of onlineUsers) {
+                if (i.user.id === data.id) {
+                } else {
+                    onlineUsers.push({ socketid: socket.id, auth, user: data })
+                }
+            }
+        }
     })
     socket.on('message', async (data) => {
-        let g = await addtomessage(data.sender.id, data.text, data.room, data.date)
-        io.to(data.room).emit('chat', g)
+        let message = await addtomessage(data.sender.id, data.text, data.room, data.date)
+        if (message.added) {
+            io.emit('newmessage', message)
+        }
+        io.to(data.room).emit('chat', message)
     });
 });
 app.use(express.json())
-app.use('/api', auth)
+app.use('/auth', auth)
 app.use('/chat', chat)
 app.use('/token', token)
 app.get('/user', validateToken, async (req, res) => {
