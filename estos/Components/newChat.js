@@ -1,10 +1,13 @@
 'use client'
 import { useState, useRef, useEffect } from 'react';
 import styles from '@/app/message/[[...chatid]]/newChat.module.css'
-import {getCookie } from 'cookies-next';
+import { getCookie } from 'cookies-next';
+import { useRouter } from 'next/navigation';
 export default function NewChat({ setsearching, updateChatlist }) {
+    let router = useRouter()
     let [usersearchValue, setusersearchValue] = useState("")
     let [searchData, setsearchData] = useState([])
+    let [selectItem, setselectItem] = useState()
     let inputRef = useRef(null)
     useEffect(() => {
         inputRef.current.focus()
@@ -25,20 +28,51 @@ export default function NewChat({ setsearching, updateChatlist }) {
             setsearchData([])
         }
     }
+    async function create() {
+        console.log("melloa")
+        if(selectItem){
+            let accessToken = getCookie('accessToken');
+            let response = await fetch(`/api/chat/create`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ receiver: selectItem })
+    
+            })
+            let result = await response.json();
+            if (!result.exists) {
+                updateChatlist(result)
+            } else {
+                router.push(`/messages/${select}`)
+            }
+        }
+    }
+    function select(e) {
+        console.log(e)
+        setselectItem(e.id)
+    }
     return (
         <div className={styles.searchContainer}>
             <div>
-                <div className={styles.title}>
-                    <button onClick={() => setsearching(false)}>
+                <div style={{display: "flex",justifyContent: "space-between"}}>
+                    <div className={styles.title}>
+                        <button onClick={() => setsearching(false)}>
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 112 120" fill="white">
+                                    <path d="M43.4465 61.7336C44.5306 60.5792 44.5306 58.7808 43.4465 57.6264L1.92687 13.4119C0.843413 12.2582 0.842672 10.4612 1.92518 9.30648L8.45958 2.33645C9.64547 1.0715 11.6536 1.07233 12.8385 2.33826L53.7597 46.0598C54.9452 47.3265 56.9548 47.3265 58.1403 46.0598L99.0615 2.33826C100.246 1.07233 102.255 1.0715 103.44 2.33645L109.975 9.30648C111.057 10.4612 111.057 12.2582 109.973 13.4119L68.4535 57.6264C67.3694 58.7808 67.3694 60.5792 68.4535 61.7336L109.973 105.948C111.057 107.102 111.057 108.899 109.975 110.054L103.44 117.024C102.255 118.288 100.246 118.288 99.0615 117.022L58.1403 73.3002C56.9548 72.0335 54.9452 72.0335 53.7597 73.3002L12.8385 117.022C11.6536 118.288 9.64547 118.288 8.45958 117.024L1.92518 110.054C0.842673 108.899 0.843415 107.102 1.92687 105.948L43.4465 61.7336Z" fill="white" />
+                                </svg>
+                            </div>
+                        </button>
                         <div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 112 120" fill="white">
-                                <path d="M43.4465 61.7336C44.5306 60.5792 44.5306 58.7808 43.4465 57.6264L1.92687 13.4119C0.843413 12.2582 0.842672 10.4612 1.92518 9.30648L8.45958 2.33645C9.64547 1.0715 11.6536 1.07233 12.8385 2.33826L53.7597 46.0598C54.9452 47.3265 56.9548 47.3265 58.1403 46.0598L99.0615 2.33826C100.246 1.07233 102.255 1.0715 103.44 2.33645L109.975 9.30648C111.057 10.4612 111.057 12.2582 109.973 13.4119L68.4535 57.6264C67.3694 58.7808 67.3694 60.5792 68.4535 61.7336L109.973 105.948C111.057 107.102 111.057 108.899 109.975 110.054L103.44 117.024C102.255 118.288 100.246 118.288 99.0615 117.022L58.1403 73.3002C56.9548 72.0335 54.9452 72.0335 53.7597 73.3002L12.8385 117.022C11.6536 118.288 9.64547 118.288 8.45958 117.024L1.92518 110.054C0.842673 108.899 0.843415 107.102 1.92687 105.948L43.4465 61.7336Z" fill="white" />
-                            </svg>
+                            <label>New message</label>
                         </div>
-                    </button>
-                    <div>
-                        <label>New message</label>
-
+                    </div>
+                    <div className={styles.createButton}>
+                        <button onClick={create}>
+                            Create
+                        </button>
                     </div>
                 </div>
                 <div className={styles.top}>
@@ -54,7 +88,7 @@ export default function NewChat({ setsearching, updateChatlist }) {
                 <div className={styles.chatListContainer}>
                     <div>
                         {searchData.map((data) => (
-                            <Item updateChatlist={updateChatlist} data={data} key={data.id} />
+                            <Item updateChatlist={updateChatlist} data={data} key={data.id} select={select} selectItem={selectItem} />
                         ))}
                     </div>
                 </div>
@@ -64,26 +98,14 @@ export default function NewChat({ setsearching, updateChatlist }) {
 }
 
 
-function Item({ data, updateChatlist }) {
+function Item({ data, select, selectItem }) {
     let itemRef = useRef(null)
-    async function create() {
-        let accessToken = getCookie('accessToken');
-        let response = await fetch(`/api/chat/create`, {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ receiver: data.id })
-
-        })
-        let result = await response.json();
-        if (!result.exists) {
-            updateChatlist(result)
-        }
+    let selected = {
+        border: "1px solid rgb(255 255 255 / 59%)",
+        background: "#383942"
     }
     return (
-        <div className={styles.chatItem} ref={itemRef} onDoubleClick={create}>
+        <div className={styles.chatItem} ref={itemRef} onClick={() => { select(data) }} style={selectItem == data.id ? selected : {}}>
             <div className={styles.chatImage}>
                 <div>
                     {/* <img src={'/pxfuel.jpg'}></img> */}
