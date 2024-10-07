@@ -11,14 +11,6 @@ import socket from "@/app/socket";
 function Chat({ selectChat, user, data, active, whotyping }) {
     let itemRef = useRef(null)
     let [typing, setTyping] = useState(false)
-    function name() {
-        let item1 = data.members[0]
-        let item2 = data.members[1]
-        if (item1.id == user.id) {
-            return item2.username
-        } else if (item2.id == user.id) { return item1.username }
-        else return null
-    }
     useEffect(() => {
         const contextMen = document.getElementsByClassName("dropdown_content")[0];
         itemRef.current.addEventListener('contextmenu', (e) => {
@@ -55,7 +47,6 @@ function Chat({ selectChat, user, data, active, whotyping }) {
         } else {
             setTyping(false)
         }
-
     }, [whotyping])
     return (
         <div className={styles.chatItem}
@@ -67,7 +58,6 @@ function Chat({ selectChat, user, data, active, whotyping }) {
                     { display: "block" } :
                     { display: "none" }
                 }>
-
                 </div>
             </div>
             <div className={styles.chatImage}>
@@ -78,7 +68,7 @@ function Chat({ selectChat, user, data, active, whotyping }) {
             <div className={styles.chatInfo}>
                 <div className={styles.nameTime}>
                     <div id={styles.name}>
-                        <label>{name()}</label>
+                        <label>{data.chat.name}</label>
                     </div>
                     <div id={styles.time}>
                         <label></label>
@@ -195,23 +185,21 @@ export default function Side() {
     useEffect(() => {
         if (!initialized.current) {
             initialized.current = true
-            socket.on('eventstopTyping', (data) => {
-                let arr = whotypingref.current.filter(item => {
+            function eventstopTyping(data) {
+                let arr = whotyping.filter(item => {
                     return item !== data
                 })
-                whotypingref.current = arr
                 setwhotyping(arr);
-            })
-            socket.on('eventTyping', (data) => {
-                if (!whotypingref.current.includes(data)) {
+            }
+            function eventTyping(data) {
+                if (!whotyping.includes(data)) {
                     setwhotyping((prevwhotyping) => {
                         const new_whotyping = [data, ...prevwhotyping];
-                        whotypingref.current = new_whotyping;
                         return new_whotyping;
                     });
                 }
-            })
-            socket.on('newmessage', async (data) => {
+            }
+            function newmessage(data) {
                 for (let index = 0; index < userChatsreff.current.length; index++) {
                     if (userChatsreff.current[index].chat.id == data.data.chat_id) {
                         let chat = userChatsreff.current[index]
@@ -223,7 +211,10 @@ export default function Side() {
                         setuserChats([{ ...chat, new: true }, ...userChatsreff.current])
                     }
                 }
-            })
+            }
+            socket.on('newmessage', newmessage)
+            socket.on('eventstopTyping', eventstopTyping)
+            socket.on('eventTyping', eventTyping)
         }
         getChats();
     }, [])
@@ -231,6 +222,7 @@ export default function Side() {
         whotypingref.current = whotyping;
     }, [whotyping])
     useEffect(() => {
+        console.log("melsak", userChats)
         userChatsreff.current = userChats;
     }, [userChats])
     useEffect(() => {
