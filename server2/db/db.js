@@ -19,7 +19,7 @@ async function getChatMembers(chat_id) {
         throw error
     }
 }
-async function getChat(chat_id,user_id) {
+async function getChat(chat_id, user_id) {
     try {
         let chat_query = await pool.query("SELECT * FROM chat WHERE id = $1", [chat_id])
         let members_query = await pool.query("SELECT * FROM chatmembers WHERE chat_id = $1", [chat_id])
@@ -32,7 +32,7 @@ async function getChat(chat_id,user_id) {
         let item1 = members[0]
         let item2 = members[1]
         if (item1.id == user_id) name = item2.username
-        else if (item2.id == user_id)  name = item1.username 
+        else if (item2.id == user_id) name = item1.username
         chat_query.rows[0].name = name
         return {
             chat: chat_query.rows[0],
@@ -78,7 +78,7 @@ async function getUserChats(user_id) {
     let userc = await pool.query('SELECT id FROM chatmembers m join chat c on c.id = m.chat_id WHERE user_id = $1 ORDER BY updated_at DESC', [user_id])
     let user_chats = []
     for (let i of userc.rows) {
-        let chats = await getChat(i.id,user_id)
+        let chats = await getChat(i.id, user_id)
         user_chats.push(chats)
     }
     return user_chats
@@ -113,8 +113,17 @@ async function createChat(sender, receiver) {
 async function getChatList(chat_id, requestor) {
     try {
         const query = await checkInChat(chat_id, requestor)
+        console.log(requestor)
         if (query.rowCount === 0) return { authorized: false };
-        let messages = await pool.query('SELECT * FROM messages WHERE chat_id = $1 ORDER BY created_at asc', [chat_id])
+        let messages = await pool.query(` 
+            SELECT * 
+            FROM public.messages
+            WHERE chat_id = $1
+            and messages.id not in (select id from messages where sender = $2 and deleted_from_sender = true  or (deleted_from_sender=true and deleted_from_receiver=true))
+            and messages.id not in (select id from messages where sender != $2 and deleted_from_receiver = true  or (deleted_from_sender=true and deleted_from_receiver=true))
+            ORDER BY created_at asc
+            
+            `, [chat_id,requestor])
         return { authorized: true, messages: messages.rows }
     } catch (error) {
         throw error

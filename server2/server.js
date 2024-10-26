@@ -74,6 +74,9 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('eventstopTyping', data.room)
     })
     socket.on("deleteMessage", async (data) => {
+        //1 delete from sender only
+        //2 completely delete the message
+        //3 the receiver deletes the message
         // console.log(data)
         const user = data.user_id
         const { type } = data
@@ -92,7 +95,7 @@ io.on('connection', (socket) => {
             }
             await client.query('COMMIT')
             console.log("gotten")
-            io.to(data.chat_id).emit('deletemessage', {deleted:true,id:message_id})
+            io.to(data.chat_id).emit('deletemessage', {userid:user, type:type,deleted:true,id:message_id})
         } catch (error) {
             io.to(data.chat_id).emit('deletemessage', {deleted:false})
             await client.query('ROLLBACK')
