@@ -28,9 +28,12 @@ function Bubble({ data, user, setContextItem }) {
             const maxX = window.innerWidth - contextMen.offsetWidth;
             const maxY = window.innerHeight - contextMen.offsetHeight;
 
+            const posX = Math.min(x, maxX);
+            const posY = Math.min(y, maxY);
+
             // Ensure the context menu stays within the window boundaries
-            contextMen.style.left = Math.min(x, maxX) + 'px';
-            contextMen.style.top = Math.min(y, maxY) + 'px';
+            contextMen.style.left = `${posX - 20}px`;
+            contextMen.style.top = `${posY}px`;
             contextMen.style.display = 'block';
         });
 
@@ -122,6 +125,7 @@ export default function Main({ params }) {
                 room: params.chatid[0],
                 date: date
             });
+            setinputValue("")
         }
     }
     async function getMessages() {

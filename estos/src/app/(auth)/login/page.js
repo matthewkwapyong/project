@@ -4,25 +4,21 @@ import { useRouter } from 'next/navigation'
 import { Login } from '@/lib'
 import { useState } from 'react'
 import { useFormState } from 'react-dom'
-
 import { Open, Close } from '../../../../Components/eye'
 import Link from "next/link";
 
 const initialState = {
     authenticated: true,
 }
-export default function Home() {
-    let [showpass, setshowpass] = useState(false)
+export default function Page() {
     const [state, formAction] = useFormState(Login, initialState)
+    let [showpass, setshowpass] = useState(false)
     let showpassword = () => setshowpass(!showpass)
-    useState(() => {
-        console.log(state)
-    })
     return (
         <div className={styles.App}>
             <div className={styles.Container + " " + styles.login}>
                 <div className={styles.top}>
-                    <label>Create Account</label>
+                    <label>Login</label>
                 </div>
                 <div className={styles.errorContainer} style={!state.authenticated ? { display: "flex" } : { display: "none" }}>
                     <div >
@@ -52,7 +48,7 @@ export default function Home() {
                                 <div className={styles.passwordContainer} style={{ width: "340px" }}>
                                     <input
                                         id={styles.pass}
-                                        type="password"
+                                        type={showpass ? "" : "password"}
                                         name="password"
                                         required
                                     />
@@ -62,16 +58,16 @@ export default function Home() {
                                         onClick={showpassword}
                                     >
                                         {showpass ?
-                                            <Close />
-                                            :
-                                            <Open />
+                                             <Open />
+                                             :
+                                             <Close />
                                         }
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div className={styles.submit}>
-                            <button type="submit">Create</button>
+                            <button type="submit">login</button>
                         </div>
                     </form>
                 </div>

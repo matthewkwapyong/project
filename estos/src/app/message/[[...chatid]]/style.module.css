@@ -37,7 +37,7 @@
     min-width: 360px;
     width: 22%;
     height: 100%;
-    background-color: #060509;
+    /* background-color: #060509; */
     border-right: 1px solid #1f1f1f;
 }
 
@@ -215,7 +215,7 @@
     display: flex;
     width: 100%;
     height: 100%;
-    background-color: black;
+    /* background-color: black; */
     flex-direction: column;
     overflow: hidden;
 }
@@ -237,7 +237,7 @@
     padding-left: 10px;
     width: 100%;
     height: 100%;
-    background: #060509;
+    /* background: #060509; */
     border-bottom: 1px solid #1f1f1f;
 }
 
@@ -263,7 +263,7 @@
     display: flex;
     width: 100%;
     height: 50px;
-    background-color: #060509;
+    /* background-color: #060509; */
     align-items: center;
     gap: 10px;
 }
@@ -330,7 +330,7 @@
 .MessagesContainer {
     flex: 1;
     overflow: auto;
-    background-color: #060509;
+    /* background-color: #060509; */
 }
 
 .MessageInputContainer {
@@ -346,7 +346,7 @@
     padding: 10px;
     max-height: 150px;
     overflow: hidden;
-    background-color: #060509;
+    /* background-color: #060509; */
 }
 
 .InputContainer {

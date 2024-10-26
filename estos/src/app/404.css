@@ -24,10 +24,13 @@
 }
 .notFound a{
     font-size: 1em;
-    color: black;
+    color: rgb(255, 255, 255);
     font-weight: 500;
     text-decoration: none;
     border-radius: 10px;
     padding: 7px 10px 10px;
-    background: rgb(255, 255, 255);
+    border: 1px solid #5b5b5b;
+}
+.notFound a:hover{
+    border: 1px solid #a4a4a4;
 }
