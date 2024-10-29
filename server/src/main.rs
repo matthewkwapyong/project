@@ -3,6 +3,9 @@
 use actix_web::{get, web, App, HttpServer, Responder};
 use tokio_postgres::{Error, NoTls};
 
+mod db;
+use db::user::User;
+
 #[get("/")]
 async fn index() -> impl Responder {
     "Hello, World!"
@@ -15,7 +18,7 @@ async fn hello(name: web::Path<String>) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let (client, connection) = tokio_postgres::connect("host=localhost user=postgres password=matthew", NoTls)
+    let (client, connection) = tokio_postgres::connect("postgres://postgres:matthew@localhost/estos", NoTls)
         .await
         .unwrap();
 
@@ -24,13 +27,14 @@ async fn main() -> std::io::Result<()> {
             eprintln!("connection error: {}", e);
         }
     });
-    let rows = client
-        .query("SELECT * FROM USERS", &[])
-        .await.unwrap();
-    for row in rows{
-        let g:String = row.get(1);
-        println!("{:?}",g);
-    }
+    User::get_user(&client,25).await;
+    // let rows = client
+    //     .query("SELECT * FROM USERS", &[])
+    //     .await.unwrap();
+    // for row in rows{
+    //     let g:String = row.get(1);
+    //     println!("{:?}",g);
+    // }
     HttpServer::new(|| App::new().service(index).service(hello))
         .bind(("127.0.0.1", 8080))?
         .run()

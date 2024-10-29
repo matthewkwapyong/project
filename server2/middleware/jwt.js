@@ -16,7 +16,7 @@ function validateToken(req, res, next) {
 }
 
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.secretKey, { expiresIn: '15s' })
+    return jwt.sign(user, process.env.secretKey, { expiresIn: '1d' })
 }
 
 module.exports = {validateToken,generateAccessToken};

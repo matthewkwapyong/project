@@ -222,7 +222,6 @@ export default function Side() {
         whotypingref.current = whotyping;
     }, [whotyping])
     useEffect(() => {
-        console.log("melsak", userChats)
         userChatsreff.current = userChats;
     }, [userChats])
     useEffect(() => {

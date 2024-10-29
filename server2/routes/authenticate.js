@@ -33,6 +33,7 @@ router.post('/login', async (req, res) => {
             res.json({ authenticated: false, type: 1 })
         }
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ error: 'Internal server error' });
     }
 })

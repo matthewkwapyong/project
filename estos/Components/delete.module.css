@@ -25,7 +25,7 @@
     border: 1px solid #444448;
     box-shadow: 0px 4px 20px 1px rgb(0 0 0);
     transition: 2s;
-    animation: animatezoom 0.3s;
+    animation: animatezoom 0.1s;
 }
 
 @keyframes animatezoom {
@@ -78,8 +78,8 @@
 }
 
 .check {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 17px;
     border-radius: 30px;
     cursor: pointer;
     border: 2px solid white;
@@ -90,9 +90,9 @@
 }
 
 .check#active {
-    background-color: black;
-    border: 2px solid #ff2c2c;
-    box-shadow: inset 0px 0px 0px 4px #ff2c2c;
+    background-color: rgb(0, 88, 192);
+    border: 2px solid rgb(0, 88, 192);
+    box-shadow: inset 0px 0px 0px 4px rgb(0 0 0);
     transition: 0.2s;
 }
 
@@ -106,9 +106,8 @@
     z-index: 10;
 
 }
-
 #delete {
-    background: #ff2c2c;
+    background: #b20509;
     width: 150px;
     height: 36px;
     cursor: pointer;
@@ -134,7 +133,7 @@
 }
 
 #delete:hover {
-    background: #ff2c2cc6;
+    background: #881e24;
 }
 
 #cancel:hover {
