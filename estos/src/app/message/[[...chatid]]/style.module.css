@@ -273,7 +273,45 @@
     color: white;
 }
 
-
+.notificationContainer{
+    /* position: relative; */
+    display: flex;
+    width: 93%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+.notificationContainer > div{
+    width: 230px;
+    height: 40px;
+    background-color: white;
+    animation-fill-mode: forwards;
+    animation: expandWidth 0.5s forwards;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    
+} 
+.notificationContainer > div > label {
+    font-weight: 500;
+    animation: opaci 2s forwards;
+}
+@keyframes opaci {
+    0% {
+        opacity: 0; /* Start at width 0 */
+    }
+    100% {
+        width: 1; /* End at width 100px */
+    }
+}
+@keyframes expandWidth {
+    0% {
+        width: 0; /* Start at width 0 */
+    }
+    100% {
+        width: 200px; /* End at width 100px */
+    }
+}
 #animationCont {
     display: flex;
     gap: 2px;

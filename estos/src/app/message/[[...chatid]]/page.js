@@ -7,6 +7,7 @@ import { getCookie } from 'cookies-next';
 import { useMessageContext } from '../context'
 import Delete from '../../../../Components/delete'
 import Scroll from "../../../../Components/scrollToBottom";
+import EditMessageContainer from "../../../../Components/editmessage";
 function Bubble({ data, user, setContextItem }) {
     let itemRef = useRef(null)
     function format_date(date) {
@@ -101,6 +102,10 @@ export default function Main({ params }) {
     let [messageLoading, setmessageLoading] = useState(true)
     let [contextItem, setContextItem] = useState()
     let [showdel, setshowdel] = useState(false)
+    let [showeditMessage, setshowEditMessage] = useState(false)
+    let [showNotification, setshowNotification] = useState(false)
+    let [notificationMessage, setnotificationMessage] = useState("")
+    let notiRef = useRef(null)
     const shouldScrollRef = useRef(true);
 
     let [typing, setTyping] = useState(false)
@@ -151,9 +156,27 @@ export default function Main({ params }) {
         setMessages(updatedItems);
         setshowdel(false)
     }
-    function down() {
-
+    function EditMessage(contextItem, body) {
+        let data = {
+            id: contextItem.id,
+            chatid: contextItem.chat_id,
+            body,
+            userid: user.id
+        }
+        socket.emit('editmessage', data)
+        setshowEditMessage(false)
+        // console.log(contextItem,body)
     }
+    function setNotification(message) {
+        clearTimeout(notiRef.current)
+        setshowNotification(true)
+        setnotificationMessage(message)
+        notiRef.current = setTimeout(() => {
+            setshowNotification(false)
+            setnotificationMessage("")
+        }, 5000);
+    }
+
     useEffect(() => {
         messagesRef.current = messages
         if (containerRef.current && shouldScrollRef.current) {
@@ -170,46 +193,84 @@ export default function Main({ params }) {
 
     useEffect(() => {
         // console.log(user)
+        function chat(data) {
+            if (data.added) {
+                setMessages((prevChat) => [...prevChat, data.data]);
+                shouldScrollRef.current = true;
+            }
+        }
+        function stoptyping(data) {
+            if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
+                setTyping(false)
+            }
+        }
+        function deletemessage(data) {
+            //1 delete from sender only
+            //2 completely delete the message
+            //3 the receiver deletes the message
+            shouldScrollRef.current = false;
+            if (data.type == 3) {
+                if (data.userid == userRef.current.id) {
+                    const updatedItems = messagesRef.current.filter(item => item.id != data.id);
+                    setMessages(updatedItems);
+                    setshowdel(false)
+                }
+            } else if (data.type == 2) {
+                const updatedItems = messagesRef.current.filter(item => item.id != data.id);
+                setMessages(updatedItems);
+                setshowdel(false)
+            } else if (data.type == 1) {
+                if (data.userid == userRef.current.id) {
+                    const updatedItems = messagesRef.current.filter(item => item.id != data.id);
+                    setMessages(updatedItems);
+                    setshowdel(false)
+                }
+            }
+        }
+        function messageEdit(data) {
+            shouldScrollRef.current = false;
+            if (data.status) {
+                if (data.userid == userRef.current.id) {
+                    const updatedItems = messagesRef.current.map(item => {
+                        if (item.id == data.id) {
+                            item.body = data.body
+                            return item
+                        }
+                        return item
+                    });
+                    setMessages(updatedItems);
+                }
+            } else {
+                setNotification("Error: Message Not Edited")
+            }
+            console.log(data)
+        }
         if (params.chatid) {
             if (!initialized.current) {
                 initialized.current = true
                 getMessages()
-                function chat(data) {
-                    if (data.added) {
-                        setMessages((prevChat) => [...prevChat, data.data]);
-                        shouldScrollRef.current = true;
-                    }
-                }
                 function istyping(data) {
+                    console.log("hello")
                     if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
                         setTyping(true)
                     }
-                }
-                function stoptyping(data) {
-                    if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
-                        setTyping(false)
-                    }
-                }
-                function deletemessage(data) {
-                    console.log(data)
-                    shouldScrollRef.current = false;
-                    const updatedItems = messagesRef.current.filter(item => item.id != data.id);
-                    setMessages(updatedItems);
-                    setshowdel(false)
                 }
                 socket.emit('join', {
                     id: params.chatid[0]
                 })
                 socket.on('chat', chat);
                 socket.on('typing', istyping)
-                socket.on('stoptyping', stoptyping)
+                // socket.on('stoptyping', stoptyping)
                 socket.on('deletemessage', deletemessage)
+                socket.on('editedmessage', messageEdit)
             }
         }
         return () => {
-            // socket.off('chat'); 
-            // socket.off('typing'); 
-            // socket.off('stoptyping'); 
+            // socket.off('chat', chat);
+            // // socket.off('typing', istyping)
+            // socket.off('stoptyping', stoptyping)
+            // socket.off('deletemessage', deletemessage)
+            // socket.off('editedmessage', messageEdit)
         };
     }, [])
     useEffect(() => {
@@ -233,7 +294,7 @@ export default function Main({ params }) {
                     <div className="dropdown_content" id="bubble_dropdown_content">
                         <div className="drop">
                             {contextItem?.sender === user.id ? <>
-                                <Item onClick={() => { console.log("hello") }}>
+                                <Item onClick={() => { setshowEditMessage(true) }}>
                                     edit
                                 </Item>
                                 <Item onClick={() => { setshowdel(true) }}>
@@ -248,6 +309,11 @@ export default function Main({ params }) {
                     </div>
                     {showdel ?
                         <Delete removeMessage={removeMessage} contextItem={contextItem} cancel={() => setshowdel(false)} owner={contextItem?.sender === user.id} user_id={user.id} />
+                        :
+                        <></>
+                    }
+                    {showeditMessage ?
+                        <EditMessageContainer Edit={EditMessage} contextItem={contextItem} cancel={() => setshowEditMessage(false)} owner={contextItem?.sender === user.id} user_id={user.id} />
                         :
                         <></>
                     }
@@ -270,6 +336,7 @@ export default function Main({ params }) {
 
                         </div>
                     </div>
+
                     <div className={styles.MessagesContainer}>
                         <div className={styles.messageListContainer} ref={containerRef}>
                             <div className={styles.messageList}>
@@ -287,16 +354,23 @@ export default function Main({ params }) {
                     </div>
                     <div className={styles.typingContainer}>
                         {typing ?
-                            <>
+                            <div style={{ width: "65px" }}>
                                 <div id={styles.animationCont}>
                                     <div id={styles.ani1}></div>
                                     <div id={styles.ani2}></div>
                                     <div id={styles.ani3}></div>
                                 </div>
-                            </>
+                            </div>
                             :
-                            <></>
+                            <div style={{ width: "65px" }}></div>
                         }
+                        <div className={styles.notificationContainer}>
+                            <div style={showNotification ? { display: "flex" } : { display: "none" }}>
+                                <label>
+                                    {notificationMessage}
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div className={styles.MessageInputContainer}>
                         <div className={styles.InputContainer}>
