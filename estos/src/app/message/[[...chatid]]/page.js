@@ -118,11 +118,12 @@ export default function Main({ params }) {
         clearTimeout(typingTimeout.current);
         typingTimeout.current = setTimeout(() => {
             socket.emit('stoptyping', { room: activeChat.chat.id.toString(), user: userRef.current });
-        }, 1000)
+        }, 4000)
         setinputValue(e.target.value)
     }
     function send() {
         if (!messageLoading) {
+            if(inputValue.length == 0) return;
             let date = new Date()
             socket.emit('message', {
                 sender: user,
@@ -260,7 +261,7 @@ export default function Main({ params }) {
                 })
                 socket.on('chat', chat);
                 socket.on('typing', istyping)
-                // socket.on('stoptyping', stoptyping)
+                socket.on('stoptyping', stoptyping)
                 socket.on('deletemessage', deletemessage)
                 socket.on('editedmessage', messageEdit)
             }
@@ -374,7 +375,7 @@ export default function Main({ params }) {
                     </div>
                     <div className={styles.MessageInputContainer}>
                         <div className={styles.InputContainer}>
-                            <textarea ref={textareaRef} value={inputValue} onChange={changeValue} placeholder="message" />
+                            <textarea ref={textareaRef} value={inputValue} onChange={changeValue} placeholder="message" style={{height: "45px"}}/>
                             <div className={styles.SendContainer}>
                                 <button onClick={send}>
                                     <SendLogo />

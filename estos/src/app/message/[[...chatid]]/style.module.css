@@ -173,6 +173,7 @@
     height: 99%;
     border: 1px solid #2b2b2bfa;
     border-radius: 5px;
+    background: #090909;
 }
 
 .search>input {
@@ -284,7 +285,8 @@
 .notificationContainer > div{
     width: 230px;
     height: 40px;
-    background-color: white;
+    box-shadow: inset 0px 0px 6px 0px #ffffff24;
+    background-color: rgba(58, 58, 58, 0.075);
     animation-fill-mode: forwards;
     animation: expandWidth 0.5s forwards;
     align-items: center;
@@ -394,9 +396,9 @@
     display: flex;
     justify-content: center;
     justify-items: center;
-    background-color: #0c0c17;
+    background-color: #090909;
     align-items: flex-end;
-    border-radius: 5px;
+    border-radius: 10px;
     border: 1px solid #2b2b2bfa;
     /* box-shadow: 0px 0px 5px 0px #28282854; */
 }
@@ -475,6 +477,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 5px;
 }
 
 .chatList {
@@ -495,8 +498,8 @@
 }
 .activeContainer >div{
     height: 70%;
-    width: 5px;
-    background-color: #0057af;
+    width: 3px;
+    background-color: #b20509;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 }
@@ -504,7 +507,7 @@
 .chatItem {
     display: flex;
     width: 95%;
-    height: 84px;
+    height: 80px;
     background-color: #00000000;
     cursor: pointer;
     border-radius: 10px;
@@ -532,9 +535,9 @@
 }
 
 .chatImage>div {
-    width: 44px;
-    height: 44px;
-    background-color: aliceblue;
+    width: 58px;
+    height: 58px;
+    background-color: #393838;
     border-radius: 40px;
 }
 
@@ -583,7 +586,8 @@
 
 }
 .typingC > label{
-  color: #007fff; 
+    font-size: 13px;
+  color: #ffffff; 
   animation: floa; 
   animation: float 3s infinite;
   animation-delay: 0.2s;

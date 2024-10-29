@@ -11,6 +11,7 @@ import socket from "@/app/socket";
 function Chat({ selectChat, user, data, active, whotyping }) {
     let itemRef = useRef(null)
     let [typing, setTyping] = useState(false)
+    let time = useRef(null)
     useEffect(() => {
         const contextMen = document.getElementsByClassName("dropdown_content")[0];
         itemRef.current.addEventListener('contextmenu', (e) => {
@@ -52,9 +53,13 @@ function Chat({ selectChat, user, data, active, whotyping }) {
         <div className={styles.chatItem}
             ref={itemRef}
             onClick={() => selectChat(data)}
+            style={active ?
+                { backgroundColor: "#91919112" } :
+                { backgroundColor: "" }
+            }
         >
             <div className={styles.activeContainer}>
-                <div style={active ?
+                <div style={data.new ?
                     { display: "block" } :
                     { display: "none" }
                 }>
@@ -75,11 +80,11 @@ function Chat({ selectChat, user, data, active, whotyping }) {
                     </div>
                 </div>
                 <div id={styles.recent_message}>
-                    {data.new ?
-                        <label style={{ color: "#3f9eff" }}>New Message</label>
+                    {/* {data.new ?
+                        <label style={{ color: "#fff" }}>New Message</label>
                         :
                         <></>
-                    }
+                    } */}
                 </div>
                 <div className={styles.typingC} style={typing ?
                     { display: "block" } :

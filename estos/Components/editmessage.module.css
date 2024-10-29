@@ -5,7 +5,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #0c0c17bd;
+    background-color: #000000bd;
     backdrop-filter: blur(2px);
     width: 100%;
     height: 100%;
@@ -20,12 +20,24 @@
     flex-direction: column;
     overflow: hidden;
     border-radius: 10px;
-    background-color: #11111c;
+    background-color: #090909;
     backdrop-filter: blur(10px);
     border: 1px solid #444448;
     box-shadow: 0px 4px 20px 1px rgb(0 0 0);
     transition: 2s;
     animation: animatezoom 0.1s;
+}
+.Container>div::before {
+    content: "";
+    position: absolute;
+    background-image: url(/grain2.png);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 1;
 }
 
 @keyframes animatezoom {
@@ -43,6 +55,7 @@
     height: 70%;
     align-items: center;
     justify-content: center;
+    z-index: 2;
 }
 .textContainer textarea{
     padding: 4px 10px;
@@ -53,7 +66,7 @@
     padding: 5px;
     border-radius: 5px;
     color: #fff;
-    background-color: rgba(255, 255, 255, 0.047);
+    background-color: rgb(28 28 28);
     outline: none;
     display: block;
     font-family: "Roboto", sans-serif;
@@ -64,6 +77,7 @@
     padding: 10px;
     font-size: 14px;
     line-height: 1.5;
+    z-index: 2;
 }
 
 

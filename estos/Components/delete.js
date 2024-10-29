@@ -21,7 +21,7 @@ export default function Home({ contextItem, cancel, owner, removeMessage,user_id
 
     return (
         <div className={styles.Container}>
-            <div style={owner ? {} : { height: "142px" }}>
+            <div style={owner ? {} : { height: "126px" }}>
                 <div className={styles.top}>
                     <div className={styles.title}>
                         <label>
