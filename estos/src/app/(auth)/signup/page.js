@@ -3,24 +3,32 @@ import styles from "../login.module.css";
 import { useRouter } from 'next/navigation'
 import { Signup } from '@/lib'
 import { useActionState, useEffect, useState } from 'react'
-import { useFormState } from 'react-dom'
+import { useFormState, useFormStatus} from 'react-dom'
 import { Open, Close } from '../../../../Components/eye'
 
 import Link from "next/link";
 const initialState = {
     exists: false,
 }
+function Submit({setloading}) {
+    const status = useFormStatus();
+    useEffect(()=>{
+        setloading(status.pending)
+    },[status])
+    return <button style={status.pending ? {cursor: "no-drop",background:"#7186f6"} : {cursor:"",background:""} } disabled={status.pending}>Submit</button>
+  }
 export default function Home() {
     const [state, formAction] = useFormState(Signup, initialState)
     let [showpass, setshowpass] = useState(false)
     let showpassword = () => setshowpass(!showpass)
+    let [loading, setloading] = useState(false)
     return (
         <div className={styles.App}>
             <div className={styles.Container + " " + styles.signup}>
                 <div className={styles.top}>
                     <label>Create Account</label>
                 </div>
-                <div className={styles.errorContainer} style={state.exists ? { display:"flex" } : {display:"none" }}>
+                <div className={styles.errorContainer} style={state.exists && !loading ? { display:"flex" } : {display:"none" }}>
                     <div >
                         <label>Email or username exists</label>
                     </div>
@@ -79,7 +87,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className={styles.submit}>
-                                <button type="submit">Create</button>
+                            <Submit setloading={setloading}/>
                             </div>
                         </div>
                     </form>

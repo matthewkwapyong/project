@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from 'next/navigation'
 
 export async function Signup(prevState, formData) {
+    prevState = {}
     let date = new Date()
     const fields = {
         firstname: formData.get("first_name"),

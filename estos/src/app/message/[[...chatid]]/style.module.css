@@ -283,10 +283,11 @@
     justify-content: center;
 }
 .notificationContainer > div{
-    width: 230px;
+    width: auto;
     height: 40px;
+    min-width: 230px;
     box-shadow: inset 0px 0px 6px 0px #ffffff24;
-    background-color: rgba(58, 58, 58, 0.075);
+    background-color: rgba(58, 58, 58, 0.285);
     animation-fill-mode: forwards;
     animation: expandWidth 0.5s forwards;
     align-items: center;
@@ -295,6 +296,7 @@
     
 } 
 .notificationContainer > div > label {
+    color: white;
     font-weight: 500;
     animation: opaci 2s forwards;
 }

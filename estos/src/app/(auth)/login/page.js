@@ -2,25 +2,39 @@
 import styles from "../login.module.css";
 import { useRouter } from 'next/navigation'
 import { Login } from '@/lib'
-import { useState } from 'react'
-import { useFormState } from 'react-dom'
+import { useState,useEffect } from 'react'
+import { useFormState,useFormStatus} from 'react-dom'
 import { Open, Close } from '../../../../Components/eye'
 import Link from "next/link";
 
 const initialState = {
     authenticated: true,
+    
 }
+function Submit({setloading}) {
+    const status = useFormStatus();
+    useEffect(()=>{
+        setloading(status.pending)
+    },[status])
+    return <button style={status.pending ? {cursor: "no-drop",background:"#7186f6"} : {cursor:"",background:""} } disabled={status.pending}>Submit</button>
+  }
+  
 export default function Page() {
     const [state, formAction] = useFormState(Login, initialState)
     let [showpass, setshowpass] = useState(false)
+    let [loading, setloading] = useState(false)
     let showpassword = () => setshowpass(!showpass)
+    useEffect(()=>{
+        console.log(loading)
+    },[loading])
+    // cursor: no-drop;
     return (
         <div className={styles.App}>
             <div className={styles.Container + " " + styles.login}>
                 <div className={styles.top}>
                     <label>Login</label>
                 </div>
-                <div className={styles.errorContainer} style={!state.authenticated ? { display: "flex" } : { display: "none" }}>
+                <div className={styles.errorContainer} style={!state.authenticated && !loading ? { display: "flex" } : { display: "none" }}>
                     <div >
                         {state.type == 0 ?
                             <label>account doesn't exists</label>
@@ -67,7 +81,8 @@ export default function Page() {
                             </div>
                         </div>
                         <div className={styles.submit}>
-                            <button type="submit">login</button>
+                            <Submit setloading={setloading}/>
+                            {/* <button type="submit"  style={loading ? {cursor: "no-drop"} : {cursor:""} } disabled={loading? true : false}>login</button> */}
                         </div>
                     </form>
                 </div>
