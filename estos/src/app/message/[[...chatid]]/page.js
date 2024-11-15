@@ -6,7 +6,6 @@ import socket from "../../socket";
 import { getCookie } from 'cookies-next';
 import { useMessageContext } from '../context'
 import Delete from '../../../../Components/delete'
-import Scroll from "../../../../Components/scrollToBottom";
 import EditMessageContainer from "../../../../Components/editmessage";
 function Bubble({ data, user, setContextItem }) {
     let itemRef = useRef(null)
@@ -94,7 +93,7 @@ function Bubble({ data, user, setContextItem }) {
 }
 export default function Main({ params }) {
     const initialized = useRef(false)
-    const { user, loading, activeChat } = useMessageContext()
+    const { user, loading, activeChat, add_messages, allMessagesRef, append_message_room } = useMessageContext()
     const textareaRef = useRef(null);
     let [messages, setMessages] = useState([])
     let messagesRef = useRef(messages)
@@ -123,7 +122,7 @@ export default function Main({ params }) {
     }
     function send() {
         if (!messageLoading) {
-            if(inputValue.length == 0) return;
+            if (inputValue.length == 0) return;
             let date = new Date()
             socket.emit('message', {
                 sender: user,
@@ -135,6 +134,12 @@ export default function Main({ params }) {
         }
     }
     async function getMessages() {
+        if (Object.keys(allMessagesRef.current).includes(params.chatid[0])) {
+            setMessages(allMessagesRef.current[params.chatid[0]])
+            setmessageLoading(false)
+            shouldScrollRef.current = true;
+            return
+        }
         let accessToken = getCookie('accessToken');
         let response = await fetch(`/api/chat/chats/${params.chatid[0]}/messages`, {
             method: "GET",
@@ -146,6 +151,7 @@ export default function Main({ params }) {
         let data = await response.json()
         setMessages(data)
         setmessageLoading(false)
+        add_messages(params.chatid[0], data)
         shouldScrollRef.current = true;
     }
     function contextmenu(data) {
@@ -177,14 +183,12 @@ export default function Main({ params }) {
             setnotificationMessage("")
         }, 5000);
     }
-
     useEffect(() => {
         messagesRef.current = messages
         if (containerRef.current && shouldScrollRef.current) {
             containerRef.current.scrollTop = containerRef.current.scrollHeight;
         }
     }, [messages]);
-
     useEffect(() => {
         userRef.current = user;
     }, [user])
@@ -195,8 +199,10 @@ export default function Main({ params }) {
     useEffect(() => {
         // console.log(user)
         function chat(data) {
-            if (data.added) {
+            if (data.added && data.data.chat_id == params.chatid[0]) {
+                console.log(data)
                 setMessages((prevChat) => [...prevChat, data.data]);
+                append_message_room(params.chatid[0], data.data)
                 shouldScrollRef.current = true;
             }
         }
@@ -256,14 +262,16 @@ export default function Main({ params }) {
                         setTyping(true)
                     }
                 }
-                socket.emit('join', {
-                    id: params.chatid[0]
-                })
-                socket.on('chat', chat);
-                socket.on('typing', istyping)
-                socket.on('stoptyping', stoptyping)
-                socket.on('deletemessage', deletemessage)
-                socket.on('editedmessage', messageEdit)
+                if (!Object.keys(allMessagesRef.current).includes(params.chatid[0])) {
+                    socket.emit('join', {
+                        id: params.chatid[0]
+                    })
+                    socket.on('chat', chat);
+                    socket.on('typing', istyping)
+                    socket.on('stoptyping', stoptyping)
+                    socket.on('deletemessage', deletemessage)
+                    socket.on('editedmessage', messageEdit)
+                }
             }
         }
         return () => {
@@ -375,7 +383,7 @@ export default function Main({ params }) {
                     </div>
                     <div className={styles.MessageInputContainer}>
                         <div className={styles.InputContainer}>
-                            <textarea ref={textareaRef} value={inputValue} onChange={changeValue} placeholder="message" style={{height: "45px"}}/>
+                            <textarea ref={textareaRef} value={inputValue} onChange={changeValue} placeholder="message" style={{ height: "45px" }} />
                             <div className={styles.SendContainer}>
                                 <button onClick={send}>
                                     <SendLogo />

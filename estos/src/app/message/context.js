@@ -1,7 +1,7 @@
 // app/message/MessageContext.js
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect,useRef} from 'react'
 import { setCookie, getCookie } from 'cookies-next';
 export const MessageContext = createContext()
 export function useMessageContext() {
@@ -12,8 +12,14 @@ export function MessageProvider({ children }) {
     const [user, setUser] = useState({})
     const [loading, setLoading] = useState(true)
     const [activeChat, setactiveChat] = useState({})
+    let allMessagesRef = useRef({})
 
-    
+    function add_messages(id,data){
+        allMessagesRef.current[id] = data
+    }
+    function append_message_room(id,data){
+        allMessagesRef.current[id].push(data)
+    }
     async function fetchData() {
         try {
             // Replace this with your actual data fetching logic
@@ -34,8 +40,11 @@ export function MessageProvider({ children }) {
     useEffect(() => {
         fetchData()
     }, [])
+    useEffect(() => {
+        console.log("hdkdjfnj")
+    })
     return (
-        <MessageContext.Provider value={{user,loading,activeChat,setactiveChat }}>
+        <MessageContext.Provider value={{ user, loading, activeChat, setactiveChat,add_messages,allMessagesRef,append_message_room }}>
             {children}
         </MessageContext.Provider>
     )
