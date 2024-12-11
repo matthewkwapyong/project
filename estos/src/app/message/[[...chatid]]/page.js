@@ -235,9 +235,10 @@ export default function Main({ params }) {
             }
         }
         function messageEdit(data) {
+            console.log("message edit")
             shouldScrollRef.current = false;
             if (data.status) {
-                if (data.userid == userRef.current.id) {
+                // if (data.userid == userRef.current.id) {
                     const updatedItems = messagesRef.current.map(item => {
                         if (item.id == data.id) {
                             item.body = data.body
@@ -246,7 +247,8 @@ export default function Main({ params }) {
                         return item
                     });
                     setMessages(updatedItems);
-                }
+
+                // }
             } else {
                 setNotification("Error: Message Not Edited")
             }
