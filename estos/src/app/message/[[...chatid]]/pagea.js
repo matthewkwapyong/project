@@ -160,7 +160,7 @@ export default function Page({params}) {
         setsearchValue(e.target.value)
         let accessToken = getCookie('accessToken');
         if (e.target.value.length > 0) {
-            let result = await fetch(`http://localhost:3001/search/${e.target.value}`, {
+            let result = await fetch(`https://project-8w7l.onrender.com/search/${e.target.value}`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${accessToken}`
@@ -175,7 +175,7 @@ export default function Page({params}) {
     async function getChats() {
         let accessToken = getCookie('accessToken');
         // console.log(accessToken)
-        let result = await fetch(`http://localhost:3001/chat/chats`, {
+        let result = await fetch(`https://project-8w7l.onrender.com/chat/chats`, {
             method: 'GET',
             headers: {
                 "Authorization": `Bearer ${accessToken}`
@@ -186,7 +186,7 @@ export default function Page({params}) {
     }
     async function getUser() {
         let accessToken = getCookie('accessToken');
-        let result = await fetch('http://localhost:3001/user', {
+        let result = await fetch('https://project-8w7l.onrender.com/user', {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${accessToken}`

@@ -18,7 +18,7 @@ export async function Signup(prevState, formData) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields)
     };
-    let result = await fetch('http://localhost:3001/auth/create', options)
+    let result = await fetch('https://project-8w7l.onrender.com/auth/create', options)
     let data = await result.json()
     if (data.created) {
         cookies().set("accessToken", data.token, {
@@ -46,7 +46,7 @@ export async function Login(prevState, formData) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields)
     };
-    let response = await fetch('http://localhost:3001/auth/login', options)
+    let response = await fetch('https://project-8w7l.onrender.com/auth/login', options)
     let data = await response.json()
     if (data.authenticated) {
         cookies().set("accessToken", data.token, {

@@ -1,4 +1,4 @@
 
-export const URL = "http://localhost:3001"
+export const URL = "https://project-8w7l.onrender.com"
 
 

@@ -120,7 +120,7 @@ export default function Main({ activeChat, user }) {
     async function get_chats() {
         console.log("keee")
         let accessToken = getCookie('accessToken');
-        let r = await fetch(`http://localhost:3001/chats/${activeChat.chat.id}/messages`, {
+        let r = await fetch(`https://project-8w7l.onrender.com/chats/${activeChat.chat.id}/messages`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${accessToken}`

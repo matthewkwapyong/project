@@ -4,7 +4,7 @@ const nextConfig = {
         return [
           {
             source: '/api/:path*',
-            destination: 'http://localhost:3001/:path*',
+            destination: 'https://project-8w7l.onrender.com/:path*',
           },
         ]
       },
