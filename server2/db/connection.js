@@ -13,12 +13,7 @@ const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } = process
 //   })
 
 
-pool = new Pool({
-  host: POSTGRES_HOST,
-  database: POSTGRES_DB,
-  user: POSTGRES_USER,
-  password: POSTGRES_PASSWORD
-});
+pool = new Pool("postgresql://estos:gEqLcmP92xErT60YkFxYltm9ElTR9uST@dpg-ctpj8mrqf0us73ecin30-a.oregon-postgres.render.com/estos");
 
 
 module.exports = pool
