@@ -15,8 +15,16 @@ let {
     createChat,
     getChatList,
 } = require('../db/db')
+async function checkIfOner(user,chat) {
+    
+}
+router.post("/remove", validateToken, async (req, res) => {
+    let chat_id = parseInt(req.body.chat_id)
+    let message_id = parseInt(req.body.id)
+    const query = await checkInChat(chat_id, user)
 
-//
+
+})
 //1 delete sender message only for sender
 //2 delete for both sender and receiver
 //3 delete only for receiver
