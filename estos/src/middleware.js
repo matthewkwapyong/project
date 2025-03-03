@@ -9,7 +9,7 @@ function redirectTo(url, request) {
 export async function middleware(request) {
   let accessToken = request.cookies.get('accessToken')
   const isMessagePath = request.nextUrl.pathname.startsWith('/message');
-
+  
   if (accessToken) {
     try {
       let response = await fetch(`${url}/token/verify`, {
@@ -17,7 +17,8 @@ export async function middleware(request) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: accessToken.value })
       })
-
+      console.log("hello world")
+      
       let result = await response.json();
       if (!result.authenticated) {
         if (result.expired) {
@@ -48,7 +49,7 @@ export async function middleware(request) {
         return NextResponse.next();
       }
     } catch (error) {
-      console.log(error)
+      console.log(error + 'error')  
       return Response.json(
         { success: false, message: 'Internal Server Error' },
         { status: 500 }

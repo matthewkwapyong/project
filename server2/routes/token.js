@@ -16,8 +16,10 @@ router.post('/refresh', (req, res) => {
     })
 })
 router.post("/verify", (req, res) => {
+    console.log(req.body.token)
     jwt.verify(req.body.token, process.env.secretKey, (err, d) => {
         if (err) {
+            console.log(err)
             if (err.name == "TokenExpiredError") {
                 return res.status(401).json({ authenticated: false, expired: true })
             }

@@ -57,7 +57,7 @@ function Bubble({ data, user, setContextItem }) {
     return (
 
         <div className={styles.messageItem}>
-            {data.sender == user.id ?
+            {data.sender == user?.user?.id ?
                 <div className={styles.mainContainer + " " + styles.sendContainer} >
                     <div id={styles.bubble} ref={itemRef} >
                         <div id={styles.text} style={{ background: "#0058c0" }}>
@@ -92,11 +92,8 @@ function Bubble({ data, user, setContextItem }) {
     )
 }
 export default function Main({ params }) {
-    const initialized = useRef(false)
     const { user, loading, activeChat, add_messages, allMessagesRef, append_message_room } = useMessageContext()
-    const textareaRef = useRef(null);
     let [messages, setMessages] = useState([])
-    let messagesRef = useRef(messages)
     let [inputValue, setinputValue] = useState("")
     let [messageLoading, setmessageLoading] = useState(true)
     let [contextItem, setContextItem] = useState()
@@ -104,14 +101,16 @@ export default function Main({ params }) {
     let [showeditMessage, setshowEditMessage] = useState(false)
     let [showNotification, setshowNotification] = useState(false)
     let [notificationMessage, setnotificationMessage] = useState("")
-    let notiRef = useRef(null)
-    const shouldScrollRef = useRef(true);
-
     let [typing, setTyping] = useState(false)
+    let textareaRef = useRef(null);
+    let initialized = useRef(false)
+    let notiRef = useRef(null)
+    let messagesRef = useRef(messages)
+    let shouldScrollRef = useRef(true);
     let typingTimeout = useRef(null)
-    const containerRef = useRef(null);
-    const userRef = useRef(user);
-    const activeChatRef = useRef(activeChat);
+    let containerRef = useRef(null);
+    let userRef = useRef(user);
+    let activeChatRef = useRef(activeChat);
     function changeValue(e) {
         socket.emit('typing', { room: activeChat.chat.id.toString(), user: userRef.current });
         clearTimeout(typingTimeout.current);
@@ -168,7 +167,7 @@ export default function Main({ params }) {
             id: contextItem.id,
             chatid: contextItem.chat_id,
             body,
-            userid: user.id
+            userid: user?.user?.id
         }
         socket.emit('editmessage', data)
         setshowEditMessage(false)
@@ -200,14 +199,13 @@ export default function Main({ params }) {
         // console.log(user)
         function chat(data) {
             if (data.added && data.data.chat_id == params.chatid[0]) {
-                console.log(data)
                 setMessages((prevChat) => [...prevChat, data.data]);
                 append_message_room(params.chatid[0], data.data)
                 shouldScrollRef.current = true;
             }
         }
         function stoptyping(data) {
-            if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
+            if (data.room == activeChatRef.current.id && data.user?.user?.id != userRef.current.id) {
                 setTyping(false)
             }
         }
@@ -239,14 +237,14 @@ export default function Main({ params }) {
             shouldScrollRef.current = false;
             if (data.status) {
                 // if (data.userid == userRef.current.id) {
-                    const updatedItems = messagesRef.current.map(item => {
-                        if (item.id == data.id) {
-                            item.body = data.body
-                            return item
-                        }
+                const updatedItems = messagesRef.current.map(item => {
+                    if (item.id == data.id) {
+                        item.body = data.body
                         return item
-                    });
-                    setMessages(updatedItems);
+                    }
+                    return item
+                });
+                setMessages(updatedItems);
 
                 // }
             } else {
@@ -260,7 +258,7 @@ export default function Main({ params }) {
                 getMessages()
                 function istyping(data) {
                     console.log("hello")
-                    if (data.room == activeChatRef.current.id && data.user.id != userRef.current.id) {
+                    if (data.room == activeChatRef.current.id && data.user?.user?.id != userRef.current.id) {
                         setTyping(true)
                     }
                 }
@@ -304,7 +302,7 @@ export default function Main({ params }) {
                 <div className={styles.Chat}>
                     <div className="dropdown_content" id="bubble_dropdown_content">
                         <div className="drop">
-                            {contextItem?.sender === user.id ? <>
+                            {contextItem?.sender === user?.user?.id ? <>
                                 <Item onClick={() => { setshowEditMessage(true) }}>
                                     edit
                                 </Item>
@@ -319,12 +317,12 @@ export default function Main({ params }) {
                         </div>
                     </div>
                     {showdel ?
-                        <Delete removeMessage={removeMessage} contextItem={contextItem} cancel={() => setshowdel(false)} owner={contextItem?.sender === user.id} user_id={user.id} />
+                        <Delete removeMessage={removeMessage} contextItem={contextItem} cancel={() => setshowdel(false)} owner={contextItem?.sender === user?.user?.id} user_id={user?.user?.id} />
                         :
                         <></>
                     }
                     {showeditMessage ?
-                        <EditMessageContainer Edit={EditMessage} contextItem={contextItem} cancel={() => setshowEditMessage(false)} owner={contextItem?.sender === user.id} user_id={user.id} />
+                        <EditMessageContainer Edit={EditMessage} contextItem={contextItem} cancel={() => setshowEditMessage(false)} owner={contextItem?.sender === user?.user?.id} user_id={user?.user?.id} />
                         :
                         <></>
                     }
@@ -351,7 +349,7 @@ export default function Main({ params }) {
                     <div className={styles.MessagesContainer}>
                         <div className={styles.messageListContainer} ref={containerRef}>
                             <div className={styles.messageList}>
-                                {loading && messageLoading && user.id ?
+                                {loading && messageLoading && user?.user?.id ?
                                     <></> :
                                     <>
                                         {messages.map((data) => (

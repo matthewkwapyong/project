@@ -178,9 +178,11 @@ export default function Side() {
                     let members = i.members
                     let item1 = members[0]
                     let item2 = members[1]
-                    if (item1.id == user.id) {
+                    // console.log(i)
+                    // console.log(user)
+                    if (item1.id == user?.user?.id) {
                         setactiveChat(i)
-                    } else if (item2.id == user.id) {
+                    } else if (item2.id == user?.user?.id) {
                         setactiveChat(i)
                     }
                 }

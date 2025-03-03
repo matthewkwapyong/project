@@ -25,6 +25,7 @@ const io = new Server(server, {
 });
 
 async function addtomessage(sender, body, chat_id, date) {
+    // console.log("hek",sender,body,chat_id,date)
     const client = await pool.connect()
     const query = `
     INSERT INTO messages (chat_id, sender, body, deleted_from_sender, deleted_from_receiver, read,created_at,edited)
@@ -152,7 +153,8 @@ io.on('connection', (socket) => {
         }
     })
     socket.on('message', async (data) => {
-        let message = await addtomessage(data.sender.id, data.text, data.room, data.date)
+        let message = await addtomessage(data.sender.user.id, data.text, data.room, data.date)
+        console.log(message)
         if (message.added) {
             io.emit('newmessage', message)
         }
@@ -167,7 +169,8 @@ app.get('/user', validateToken, async (req, res) => {
     let user_id = req.tokenData.id
     let text = 'SELECT id,firstname,lastname,username FROM users WHERE id = $1'
     let data = await pool.query(text, [user_id])
-    return res.json(data.rows[0])
+    // console.log(data)
+    return res.json({user:data.rows[0]})
 })
 app.get('/search/:text', async (req, res) => {
     let tex = req.params.text
